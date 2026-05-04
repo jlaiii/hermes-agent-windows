@@ -33,10 +33,10 @@
 Open **PowerShell as Administrator** and run:
 
 ```powershell
-irm https://jlaiii.github.io/hermes-agent-windows/install.ps1 | iex
+irm https://raw.githubusercontent.com/jlaiii/hermes-agent-windows/main/Install-Hermes-Windows.ps1 | iex
 ```
 
-Or download `install.ps1` manually and execute it with right-click → **Run with PowerShell**.
+Or download `Install-Hermes-Windows.ps1` manually and execute it with right-click → **Run with PowerShell**.
 
 ---
 
