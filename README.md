@@ -3,9 +3,30 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-blue)](https://jlaiii.github.io/hermes-agent-windows/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> One-click Windows installer for [Hermes Agent](https://hermes-agent.nousresearch.com/) — an intelligent AI assistant by Nous Research.
+**One-click Windows installer for [Hermes Agent](https://hermes-agent.nousresearch.com/) by Nous Research.**
+
+Hermes Agent officially supports Linux, macOS, and WSL2 — not native Windows. This project **bridges that gap** for Windows users by automating the entire WSL2-based setup from end to end. You run one script and everything happens automatically.
 
 **Live Site:** https://jlaiii.github.io/hermes-agent-windows/
+
+**GitHub Repo:** https://github.com/jlaiii/hermes-agent-windows
+
+---
+
+## Who Is This For?
+
+- **Windows users** who want to run Hermes Agent but don't want to manually set up WSL, Ubuntu, Ollama, and Linux dependencies
+- **Non-technical users** who just want to click a `.bat` file or run a one-liner and have it work
+- **Anyone** who wants Windows-native shortcuts and launchers for a Linux-only AI agent
+
+Hermes Agent is not natively available for Windows. Normally you would have to:
+1. Manually enable WSL2 in Windows
+2. Install Ubuntu-22.04 from the Microsoft Store
+3. Install Ollama inside Ubuntu
+4. Install Hermes Agent inside Ubuntu
+5. Figure out how to launch everything from Windows
+
+**This installer does all of that for you.** It handles the reboot, resumes automatically, and gives you proper Windows desktop shortcuts and `.bat` launchers so you never need to type a WSL command manually.
 
 ---
 
