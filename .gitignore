@@ -1,0 +1,44 @@
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# PowerShell
+*.ps1.log
+*.ps1.xml
+
+# WSL / Linux artifacts
+*.deb
+*.tar.gz
+*.zip
+
+# Installer output
+output/
+dist/
+build/
+
+# Local configuration
+config.local.json
+.env
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vs/
+.vscode/
+idea/
+
+# Node / Jekyll (for GitHub Pages)
+node_modules/
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~

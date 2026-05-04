@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hermes Agent for Windows — One-Click Installer</title>
+  <meta name="description" content="One-click Windows installer for Hermes Agent. Sets up WSL2, Ubuntu-22.04, Ollama, and Hermes Agent automatically.">
+  <style>
+    :root{
+      --bg:#050711;
+      --surface:#0b0f1e;
+      --text:#e5e8ef;
+      --muted:#9aa3b2;
+      --accent:#00e5ff;
+      --accent-2:#7c4dff;
+      --border:rgba(255,255,255,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:radial-gradient(1200px 600px at 50% -10%,#111935 0%,var(--bg) 55%);
+      color:var(--text);
+      line-height:1.65;
+    }
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:980px;margin:0 auto;padding:48px 20px}
+    header{text-align:center;margin-bottom:56px}
+    .brand{display:inline-flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.025em;font-size:clamp(26px,5vw,38px)}
+    .brand span{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;color:transparent}
+    .tagline{color:var(--muted);margin-top:10px;font-size:clamp(15px,2.2vw,18px);max-width:640px;margin-left:auto;margin-right:auto}
+    .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:12px;font-weight:700;border:1px solid var(--border);transition:transform .08s ease,box-shadow .25s ease}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,255,.15);text-decoration:none}
+    .primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#000;border-color:transparent}
+    .secondary{background:var(--surface);color:var(--text)}
+    section{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:24px}
+    h2{margin-top:0;font-size:22px;letter-spacing:-.01em;margin-bottom:16px}
+    h3{font-size:18px;margin:22px 0 10px}
+    pre{overflow-x:auto;background:#040817;border:1px solid var(--border);padding:16px;border-radius:14px;font-size:13px}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;background:rgba(255,255,255,.06);padding:2px 7px;border-radius:6px;font-size:.95em}
+    .steps{display:grid;gap:14px}
+    .step{display:flex;gap:14px;align-items:flex-start}
+    .step .num{flex:0 0 36px;height:36px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#000;font-weight:800;font-size:14px}
+    .step .body{flex:1}
+    ul{padding-left:20px;margin:8px 0}
+    li{margin:6px 0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .card{background:#0e1430;border:1px solid var(--border);border-radius:16px;padding:18px}
+    .card h4{margin:0 0 8px;font-size:16px}
+    .card p{margin:0;color:var(--muted);font-size:14px}
+    .badge{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--muted);margin-right:6px}
+    footer{text-align:center;color:var(--muted);font-size:14px;margin-top:10px;padding-bottom:40px}
+    footer a{color:var(--accent-2)}
+    @media (max-width:520px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <div class="brand">Hermes <span>for Windows</span></div>
+      <p class="tagline">One-click installer that sets up WSL2, Ubuntu-22.04, Ollama, and Hermes Agent — plus desktop shortcuts and .bat launchers.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/jlaiii/hermes-agent-windows/releases/latest">Download Latest</a>
+        <a class="btn secondary" href="https://github.com/jlaiii/hermes-agent-windows">View on GitHub</a>
+      </div>
+      <p style="margin-top:10px;font-size:13px;color:var(--muted)">Or run it from PowerShell (Admin) in one line:</p>
+      <pre style="max-width:720px;margin:10px auto 0"><code>irm https://raw.githubusercontent.com/jlaiii/hermes-agent-windows/main/Install-Hermes-Windows.ps1 | iex</code></pre>
+    </header>
+
+    <section id="features">
+      <h2>What It Does</h2>
+      <div class="grid">
+        <div class="card">
+          <h4>One-Click Install</h4>
+          <p>Run a single PowerShell script and walk away. Handles every dependency automatically.</p>
+        </div>
+        <div class="card">
+          <h4>WSL2 + Ubuntu-22.04</h4>
+          <p>Checks, installs, configures WSL2, and pulls Ubuntu-22.04 if missing. Reboots and resumes automatically.</p>
+        </div>
+        <div class="card">
+          <h4>Ollama Included</h4>
+          <p>Installs Ollama inside WSL and pulls a lightweight model so local AI works out of the box.</p>
+        </div>
+        <div class="card">
+          <h4>Hermes Agent</h4>
+          <p>Installs the official NousResearch Hermes Agent in WSL with the one-line installer.</p>
+        </div>
+        <div class="card">
+          <h4>Desktop Shortcuts</h4>
+          <p>Creates Start Menu and Desktop shortcuts for CLI, Gateway, Ollama Server, and Setup.</p>
+        </div>
+        <div class="card">
+          <h4>Portable Launchers</h4>
+          <p>Generates Windows .bat files so you can start services from Windows without touching WSL directly.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="quick-start">
+      <h2>Quick Start</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="num">1</div>
+          <div class="body"><strong>Download</strong> the latest release or copy the one-liner above.</div>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <div class="body"><strong>Run</strong> <code>Run-Setup.bat</code> (or the PowerShell script) as Administrator.</div>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <div class="body"><strong>Reboot</strong> when prompted (only if WSL was not already installed). Setup resumes automatically after login.</div>
+        </div>
+        <div class="step">
+          <div class="num">4</div>
+          <div class="body"><strong>Use</strong> the new Desktop shortcuts: Hermes CLI, Hermes Gateway, Ollama Server, and Hermes Setup.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="launchers">
+      <h2>Launchers Created</h2>
+      <ul>
+        <li><strong>Hermes CLI</strong> — Interactive chat inside WSL</li>
+        <li><strong>Hermes Gateway</strong> — Messaging gateway server (Telegram, Discord, etc.)</li>
+        <li><strong>Hermes ACP Server</strong> — ACP server for editor integrations</li>
+        <li><strong>Ollama Server</strong> — Local LLM inference backend</li>
+        <li><strong>Hermes Setup</strong> — First-time configuration wizard</li>
+      </ul>
+    </section>
+
+    <section id="system-requirements">
+      <h2>System Requirements</h2>
+      <ul>
+        <li>Windows 10 version 20H2 or later / Windows 11</li>
+        <li>Administrator privileges (WSL requires it)</li>
+        <li>At least ~4 GB free disk space</li>
+        <li>Internet connection during install</li>
+      </ul>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>Troubleshooting</h2>
+      <h3>WSL requires a reboot</h3>
+      <p>This is normal on first-time installs. The script registers itself in <code>RunOnce</code> and resumes after login.</p>
+      <h3>Hermes command not found in WSL</h3>
+      <p>Open a new WSL terminal so the PATH update from the installer takes effect, or run <code>source ~/.bashrc</code>.</p>
+      <h3>Uninstall</h3>
+      <p>Run <code>Uninstall-Hermes-Windows.ps1</code> from the repo. Use <code>-KeepWSL</code> if you want to keep Ubuntu.</p>
+    </section>
+
+    <footer>
+      <p>
+        <span class="badge">MIT License</span>
+        <span class="badge">Windows 10/11</span>
+        <span class="badge">WSL2</span>
+      </p>
+      <p style="margin-top:8px">
+        Built by <a href="https://github.com/jlaiii">@jlaiii</a> for <a href="https://github.com/NousResearch/hermes-agent">NousResearch/hermes-agent</a>
+      </p>
+      <p>
+        <a href="https://github.com/jlaiii/hermes-agent-windows">GitHub Repo</a> &bull;
+        <a href="https://jlaiii.github.io/hermes-agent-windows/">GitHub Pages</a> &bull;
+        <a href="https://github.com/jlaiii/hermes-agent-windows/issues">Issues</a>
+      </p>
+    </footer>
+
+  </div>
+</body>
+</html>
