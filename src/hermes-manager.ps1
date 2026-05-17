@@ -107,8 +107,10 @@ function Update-HermesAgent {
         return Install-HermesAgent
     }
 
-    # Fast path: update in-place via git pull (avoids installer TTY prompts that deadlock in background jobs).
-    # The installer always clones into ~/.hermes/hermes-agent, so a git repo should exist.
+    # Fast path: update in-place via git pull.
+    # The NousResearch installer clones into ~/.hermes/hermes-agent and builds
+    # a venv with uv.  uv venv does NOT include pip by default, so we use
+    # ensurepip to bootstrap it, then install the updated package.
     $fastUpdate = @'
 set +e
 if [ -d "$HOME/.hermes/hermes-agent/.git" ]; then
@@ -118,20 +120,41 @@ if [ -d "$HOME/.hermes/hermes-agent/.git" ]; then
     current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
     git reset --hard "origin/${current_branch}" 2>/dev/null || git reset --hard origin/main
     echo "Installing updated package..."
-    pip_path="$HOME/.hermes/hermes-agent/venv/bin/pip"
-    if [ -x "$pip_path" ]; then
-        "$pip_path" install -e . 2>&1
+
+    venv_bin="$HOME/.hermes/hermes-agent/venv/bin"
+    venv_python="$venv_bin/python"
+    if [ ! -x "$venv_python" ]; then
+        echo "ERROR: venv python not found at $venv_python"
+        exit 1
+    fi
+
+    # uv venv creates venvs without pip — bootstrap it with ensurepip
+    if [ ! -x "$venv_bin/pip" ]; then
+        echo "Bootstrapping pip into venv..."
+        "$venv_python" -m ensurepip --upgrade 2>&1
+    fi
+
+    # Install updated package with venv pip
+    if [ -x "$venv_bin/pip" ]; then
+        "$venv_bin/pip" install -e . 2>&1
         pip_exit=$?
     else
-        python3 -m pip install -e . 2>&1
-        pip_exit=$?
+        echo "ERROR: pip not available even after ensurepip"
+        exit 1
     fi
+
     if [ $pip_exit -eq 0 ]; then
         echo "In-place update complete."
     elif command -v uv &>/dev/null; then
         echo "pip install failed (exit $pip_exit), trying uv..."
-        uv pip install -e . 2>&1
-        uv_exit=$?
+        # uv sync with the lockfile is the installer default; tell uv which env to target
+        if [ -f "uv.lock" ]; then
+            UV_PROJECT_ENVIRONMENT="$HOME/.hermes/hermes-agent/venv" uv sync --extra all --locked 2>&1
+            uv_exit=$?
+        else
+            uv pip install -e ".[all]" 2>&1
+            uv_exit=$?
+        fi
         if [ $uv_exit -eq 0 ]; then
             echo "In-place update complete via uv."
         else
@@ -143,28 +166,90 @@ if [ -d "$HOME/.hermes/hermes-agent/.git" ]; then
         exit 1
     fi
 else
-    echo "No git repository found; falling back to installer script."
+    echo "No git repository found; falling back to fresh clone."
     exit 1
 fi
 '@
     $result = Invoke-HermesWslCommand -Command $fastUpdate -AsAdminUser -TimeoutSeconds 300
 
-    # Fallback: download installer script to a temp file first, then run with stdin closed
-    # so any /dev/tty reads in the installer get EOF immediately instead of hanging.
+    # Fallback: re-clone the repo and rebuild the venv from scratch,
+    # using the original installer script but in a fully non-interactive way.
+    # The upstream script has prompt_yes_no() that reads /dev/tty directly,
+    # which deadlocks in a background PowerShell job.  Instead, we replicate
+    # only the safe parts here (clone, re-create venv, install).
     if ($result.Status -ne 'Success') {
         $logFile = Get-LogFilePath -Kind 'app'
-        Write-Log -Message 'Fast in-place update failed or not available. Falling back to installer script.' -Level 'WARN' -LogFile $logFile | Out-Null
-        $installerPath = '/tmp/hermes-agent-update.sh'
-        $installerCmd = @"
+        Write-Log -Message 'Fast in-place update failed. Reinstalling from scratch (safe non-interactive fallback).' -Level 'WARN' -LogFile $logFile | Out-Null
+
+        $fallbackScript = @'
 set -e
-cd /tmp
-curl -fSL -o '$installerPath' 'https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh'
-# Run the installer script with --skip-setup, but give it an empty stdin so any
-# prompt that falls back to reading stdin gets EOF instead of hanging forever.
-bash '$installerPath' --skip-setup </dev/null 2>&1
-rm -f '$installerPath'
-"@
-        $result = Invoke-HermesWslCommand -Command $installerCmd -AsAdminUser -TimeoutSeconds 900
+HERMES_DIR="$HOME/.hermes/hermes-agent"
+BACKUP_DIR="$HOME/.hermes/hermes-agent-backup-$(date +%Y%m%d%H%M%S)"
+
+# Backup existing config and .env so they survive the reinstall
+if [ -f "$HERMES_DIR/.env" ]; then
+    mkdir -p "$BACKUP_DIR"
+    cp "$HERMES_DIR/.env" "$BACKUP_DIR/"
+fi
+if [ -f "$HOME/.hermes/config.yaml" ]; then
+    mkdir -p "$BACKUP_DIR"
+    cp "$HOME/.hermes/config.yaml" "$BACKUP_DIR/"
+fi
+
+# Remove stale checkout and clone fresh
+rm -rf "$HERMES_DIR"
+mkdir -p "$HERMES_DIR"
+cd "$HERMES_DIR"
+
+# Try SSH first, fall back to HTTPS
+git clone --depth 1 --branch main https://github.com/NousResearch/hermes-agent.git "$HERMES_DIR-temp" 2>/dev/null || \
+git clone --depth 1 --branch main git@github.com:NousResearch/hermes-agent.git "$HERMES_DIR-temp" 2>/dev/null || {
+    echo "ERROR: git clone failed. Check network connectivity."
+    exit 1
+}
+rm -rf "$HERMES_DIR"
+mv "$HERMES_DIR-temp" "$HERMES_DIR"
+cd "$HERMES_DIR"
+
+# Rebuild venv.  uv is preferred because the upstream installer uses it.
+if command -v uv &>/dev/null; then
+    export UV_NO_CONFIG=1
+    uv venv venv --python 3.11 2>&1
+    venv_python="$HERMES_DIR/venv/bin/python"
+    "$venv_python" -m ensurepip --upgrade 2>&1 || true
+    UV_PROJECT_ENVIRONMENT="$HERMES_DIR/venv" uv sync --extra all --locked 2>&1 || {
+        uv pip install -e ".[all]" 2>&1
+    }
+elif command -v python3 &>/dev/null; then
+    python3 -m venv venv 2>&1
+    "$HERMES_DIR/venv/bin/python" -m ensurepip --upgrade 2>&1
+    "$HERMES_DIR/venv/bin/pip" install -e ".[all]" 2>&1
+else
+    echo "ERROR: Neither uv nor python3 available to create venv."
+    exit 1
+fi
+
+# Restore backed-up config
+if [ -d "$BACKUP_DIR" ]; then
+    [ -f "$BACKUP_DIR/.env" ] && cp "$BACKUP_DIR/.env" "$HERMES_DIR/.env"
+    [ -f "$BACKUP_DIR/config.yaml" ] && cp "$BACKUP_DIR/config.yaml" "$HOME/.hermes/config.yaml"
+    echo "Config restored from backup."
+fi
+
+# Re-create the ~/.local/bin/hermes shim
+mkdir -p "$HOME/.local/bin"
+cat > "$HOME/.local/bin/hermes" <<'SHIM'
+#!/usr/bin/env bash
+unset PYTHONPATH
+unset PYTHONHOME
+SHIM_HERMES_DIR="$HOME/.hermes/hermes-agent"
+exec "$SHIM_HERMES_DIR/venv/bin/python" -m hermes_cli.main "$@"
+SHIM
+chmod +x "$HOME/.local/bin/hermes"
+
+echo "Reinstall complete."
+'@
+        $result = Invoke-HermesWslCommand -Command $fallbackScript -AsAdminUser -TimeoutSeconds 900
     }
 
     if ($result.Status -eq 'Success' -and (Test-HermesInstalled)) {
