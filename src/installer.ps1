@@ -32,6 +32,8 @@ function Invoke-StatusCheck {
     $hermesVersion = Get-HermesVersion
     $gatewayStatus = Get-HermesGatewayStatus
     $appStatus = Get-hermes-agent-windowsAppStatus
+    $bootLaunch = Get-WindowsBootLaunchStatus
+    $wslDisk = Get-WslDiskUsage
     $updateCheck = Get-HermesUpdateStatus
 
     $ollamaStatus = Format-StatusResult -Name 'Ollama Status' -Status $(if ($ollamaAvailable) { $ollamaRunning.Status } else { 'Missing' }) -Message $(if ($ollamaAvailable) { 'Ollama is installed inside WSL.' } else { 'Ollama is missing inside WSL.' }) -Details $(if ($ollamaAvailable) { $ollamaRunning.Details } else { 'Use Install Ollama in WSL.' })
@@ -44,12 +46,14 @@ function Invoke-StatusCheck {
         "WSL Version: $($wslVersion.Status) - $($wslVersion.Message)"
         "WSL Distro: $($wslDistros.Status) - $($wslDistros.Message)"
         "WSL Account: $($wslAccount.Status) - $($wslAccount.Message)"
+        "WSL Disk: $($wslDisk.Status) - $($wslDisk.Message)"
         "Ollama Status: $($ollamaStatus.Status) - $($ollamaStatus.Message)"
         "Ollama Version: $($ollamaVersion.Status) - $($ollamaVersion.Message)"
         "Hermes Status: $($hermesStatus.Status) - $($hermesStatus.Message)"
         "Hermes Version: $($hermesVersion.Status) - $($hermesVersion.Message)"
         "Hermes Gateway: $($gatewayStatus.Status) - $($gatewayStatus.Message)"
         "hermes-agent-windows App: $($appStatus.Status) - $($appStatus.Message)"
+        "Boot Launch: $($bootLaunch.Status) - $($bootLaunch.Message)"
         "Update Status: $($updateCheck.Status) - $($updateCheck.Message)"
     )
 
@@ -72,6 +76,8 @@ function Invoke-StatusCheck {
         HermesVersion    = [pscustomobject]$hermesVersion
         GatewayStatus    = [pscustomobject]$gatewayStatus
         AppStatus        = [pscustomobject]$appStatus
+        WslDisk          = [pscustomobject]$wslDisk
+        BootLaunch       = [pscustomobject]$bootLaunch
         Updates          = [pscustomobject]$updateCheck
         Summary          = "App: $($appStatus.Status) | WSL: $($wslDistros.Status) | Account: $($wslAccount.Status) | Ollama: $($ollamaStatus.Status) | Hermes: $($hermesStatus.Status) | Gateway: $($gatewayStatus.Status) | Updates: $($updateCheck.Status)"
     }

@@ -297,6 +297,13 @@ function Start-hermes-agent-windowsGui {
                                 <TextBlock x:Name="UpdatesDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </Border>
+                        <Border x:Name="WslDiskStatusBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Disk" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="WslDiskValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="WslDiskDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
                     </UniformGrid>
                 </ScrollViewer>
             </Border>
@@ -377,6 +384,8 @@ function Start-hermes-agent-windowsGui {
                     <WrapPanel>
                         <Button x:Name="OpenConfigButton" Content="Open Config Folder"
                                 ToolTip="Open the Hermes configuration folder inside WSL in Windows Explorer." />
+                        <Button x:Name="BootLaunchButton" Content="Boot Launch: OFF"
+                                ToolTip="Toggle whether hermes-agent-windows starts automatically when Windows boots." />
                         <Button x:Name="OpenLogsButton" Content="Open Logs Folder"
                                 ToolTip="Open the local application logs folder in Windows Explorer." />
                         <Button x:Name="GitHubButton" Content="Built by jlaiii"
@@ -446,6 +455,9 @@ function Start-hermes-agent-windowsGui {
         UpdatesValue        = $window.FindName('UpdatesValue')
         UpdatesDetail       = $window.FindName('UpdatesDetail')
         UpdatesStatusBorder = $window.FindName('UpdatesStatusBorder')
+        WslDiskValue        = $window.FindName('WslDiskValue')
+        WslDiskDetail       = $window.FindName('WslDiskDetail')
+        WslDiskStatusBorder = $window.FindName('WslDiskStatusBorder')
         LogBox              = $window.FindName('LogBox')
         CheckStatusButton   = $window.FindName('CheckStatusButton')
         InstallWslButton    = $window.FindName('InstallWslButton')
@@ -467,6 +479,7 @@ function Start-hermes-agent-windowsGui {
         WipeWslButton       = $window.FindName('WipeWslButton')
         OpenConfigButton    = $window.FindName('OpenConfigButton')
         OpenLogsButton      = $window.FindName('OpenLogsButton')
+        BootLaunchButton    = $window.FindName('BootLaunchButton')
         ExitButton          = $window.FindName('ExitButton')
         GitHubButton        = $window.FindName('GitHubButton')
     }
@@ -569,7 +582,28 @@ function Start-hermes-agent-windowsGui {
         Set-StatusVisual $controls.HermesVersionValue $controls.HermesVersionDetail $controls.HermesVersionBorder $Summary.HermesVersion.Status $Summary.HermesVersion.Message $Summary.HermesVersion.Details
         Set-StatusVisual $controls.GatewayValue $controls.GatewayDetail $controls.GatewayStatusBorder $Summary.GatewayStatus.Status $Summary.GatewayStatus.Message $Summary.GatewayStatus.Details
         Set-StatusVisual $controls.UpdatesValue $controls.UpdatesDetail $controls.UpdatesStatusBorder $Summary.Updates.Status $Summary.Updates.Message $Summary.Updates.Details
-        $controls.TopStatusText.Text = $Summary.Summary
+        Set-StatusVisual $controls.WslDiskValue $controls.WslDiskDetail $controls.WslDiskStatusBorder $Summary.WslDisk.Status $Summary.WslDisk.Message $Summary.WslDisk.Details
+
+        # Update-available indicator: gold text in top status bar when an update is detected
+        if ($Summary.Updates.Status -eq 'Needs Update') {
+            $controls.TopStatusText.Foreground = [System.Windows.Media.Brushes]::Gold
+            $controls.TopStatusText.Text = "UPDATE AVAILABLE - $($Summary.Updates.Message)"
+        }
+        else {
+            $controls.TopStatusText.Foreground = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromArgb(255, 139, 145, 157))
+            $controls.TopStatusText.Text = $Summary.Summary
+        }
+
+        # Sync boot-launch button label from status check
+        if ($Summary.BootLaunch.Status -eq 'Enabled') {
+            $controls.BootLaunchButton.Content = 'Boot Launch: ON'
+        }
+        elseif ($Summary.BootLaunch.Status -eq 'Disabled') {
+            $controls.BootLaunchButton.Content = 'Boot Launch: OFF'
+        }
+        else {
+            $controls.BootLaunchButton.Content = 'Boot Launch: ?'
+        }
     }
 
     function Refresh-AppLogTail {
@@ -686,6 +720,13 @@ function Start-hermes-agent-windowsGui {
         Start-GuiJob -TaskName 'HermesDoctor' -FunctionName 'Invoke-HermesDoctor'
     }
 
+    function Start-ToggleBootLaunchJob {
+        # Determine current state from the button label and toggle
+        $currentLabel = $controls.BootLaunchButton.Content
+        $enable = if ($currentLabel -match 'OFF') { $true } else { $false }
+        Start-GuiJob -TaskName 'ToggleBootLaunch' -FunctionName 'Set-WindowsBootLaunch' -FunctionArguments @($enable)
+    }
+
     function Start-EnableGatewayJob {
         Start-GuiJob -TaskName 'EnableGateway' -FunctionName 'Enable-HermesGateway'
     }
@@ -761,6 +802,21 @@ function Start-hermes-agent-windowsGui {
                         elseif ($taskName -eq 'SaveOllamaCloud' -or $taskName -eq 'TestOllamaCloud' -or $taskName -eq 'InstallApp' -or $taskName -eq 'UninstallApp' -or $taskName -eq 'InstallWsl' -or $taskName -eq 'RestartWsl' -or $taskName -eq 'AdminAccount' -or $taskName -eq 'InstallOllama' -or $taskName -eq 'StartOllama' -or $taskName -eq 'InstallHermes' -or $taskName -eq 'UpdateHermes' -or $taskName -eq 'HermesDoctor' -or $taskName -eq 'EnableGateway' -or $taskName -eq 'CleanHermes' -or $taskName -eq 'ReinstallWsl' -or $taskName -eq 'WipeWsl' -or $taskName -eq 'FullSetup') {
                             $controls.TopStatusText.Text = "$taskName finished with $($result.Status)."
                             Add-GuiLogLine "[$taskName] $($result.Message)"
+                            Start-StatusCheckJob
+                        }
+                        elseif ($taskName -eq 'ToggleBootLaunch') {
+                            $controls.TopStatusText.Text = "$taskName finished with $($result.Status)."
+                            Add-GuiLogLine "[$taskName] $($result.Message)"
+                            # Update button label to reflect new state
+                            if ($result.Status -eq 'Enabled') {
+                                $controls.BootLaunchButton.Content = 'Boot Launch: ON'
+                            }
+                            elseif ($result.Status -eq 'Disabled') {
+                                $controls.BootLaunchButton.Content = 'Boot Launch: OFF'
+                            }
+                            else {
+                                $controls.BootLaunchButton.Content = 'Boot Launch: ERROR'
+                            }
                             Start-StatusCheckJob
                         }
                         elseif ($taskName -eq 'StartHermes' -or $taskName -eq 'StopHermes' -or $taskName -eq 'RestartHermes') {
@@ -879,6 +935,9 @@ function Start-hermes-agent-windowsGui {
         $result = Open-FolderSafe -Path (Join-Path $script:GuiState.ProjectRoot 'logs')
         Add-GuiLogLine "Open Logs Folder: $($result.Message)"
     })
+    $controls.BootLaunchButton.Add_Click({
+        Start-ToggleBootLaunchJob
+    })
     $controls.ExitButton.Add_Click({
         $window.Close()
     })
@@ -894,16 +953,34 @@ function Start-hermes-agent-windowsGui {
 
     Add-GuiLogLine 'hermes-agent-windows GUI started.'
 
-    # Pre-fill model dropdown with default models so it's never empty on launch
-    $defaultModels = @('kimi-k2.6:cloud', 'qwen3:cloud', 'qwq:cloud', 'gemma3:cloud', 'mistral-small:cloud', 'llama3.3:cloud', 'qwen2.5:cloud', 'deepseek-r1:cloud', 'phi4:cloud', 'granite3.2:cloud')
-    $controls.OllamaModelBox.Items.Clear()
-    foreach ($modelName in $defaultModels) {
-        [void]$controls.OllamaModelBox.Items.Add($modelName)
+    # Always pre-fill model dropdown: cache first, then hardcoded fallback.
+    # The 'Refresh Models' button still works for an on-demand re-fetch.
+    $cached = Import-OllamaCloudModels
+    if ($cached.Status -eq 'Installed' -and $cached.Models) {
+        $controls.OllamaModelBox.Items.Clear()
+        foreach ($modelName in $cached.Models) {
+            [void]$controls.OllamaModelBox.Items.Add($modelName)
+        }
+        if ([string]::IsNullOrWhiteSpace($controls.OllamaModelBox.Text)) {
+            $controls.OllamaModelBox.Text = 'kimi-k2.6:cloud'
+        }
+        Add-GuiLogLine "Loaded $($cached.Models.Count) cached models (fetched $($cached.Details))."
     }
-    if ([string]::IsNullOrWhiteSpace($controls.OllamaModelBox.Text)) {
-        $controls.OllamaModelBox.Text = 'kimi-k2.6:cloud'
+    else {
+        $defaultModels = @('kimi-k2.6:cloud', 'qwen3:cloud', 'qwq:cloud', 'gemma3:cloud', 'mistral-small:cloud', 'llama3.3:cloud', 'qwen2.5:cloud', 'deepseek-r1:cloud', 'phi4:cloud', 'granite3.2:cloud')
+        $controls.OllamaModelBox.Items.Clear()
+        foreach ($modelName in $defaultModels) {
+            [void]$controls.OllamaModelBox.Items.Add($modelName)
+        }
+        if ([string]::IsNullOrWhiteSpace($controls.OllamaModelBox.Text)) {
+            $controls.OllamaModelBox.Text = 'kimi-k2.6:cloud'
+        }
+        Add-GuiLogLine "Loaded $($defaultModels.Count) default models."
     }
-    Add-GuiLogLine "Loaded $($defaultModels.Count) default models."
+
+    # Auto-refresh model list in background so user never has to press Refresh manually
+    Add-GuiLogLine 'Checking for newer model list from ollama.com (background)...'
+    Start-RefreshOllamaModelsJob
 
     Start-StatusCheckJob
 
