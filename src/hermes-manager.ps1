@@ -110,7 +110,7 @@ function Update-HermesAgent {
     # Fast path: update in-place via git pull (avoids installer TTY prompts that deadlock in background jobs).
     # The installer always clones into ~/.hermes/hermes-agent, so a git repo should exist.
     $fastUpdate = @'
-set -e
+set +e
 if [ -d "$HOME/.hermes/hermes-agent/.git" ]; then
     cd "$HOME/.hermes/hermes-agent"
     echo "Updating Hermes Agent from git..."
@@ -118,12 +118,30 @@ if [ -d "$HOME/.hermes/hermes-agent/.git" ]; then
     current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
     git reset --hard "origin/${current_branch}" 2>/dev/null || git reset --hard origin/main
     echo "Installing updated package..."
-    if command -v uv &>/dev/null; then
-        uv pip install -e . 2>&1
+    pip_path="$HOME/.hermes/hermes-agent/venv/bin/pip"
+    if [ -x "$pip_path" ]; then
+        "$pip_path" install -e . 2>&1
+        pip_exit=$?
     else
         python3 -m pip install -e . 2>&1
+        pip_exit=$?
     fi
-    echo "In-place update complete."
+    if [ $pip_exit -eq 0 ]; then
+        echo "In-place update complete."
+    elif command -v uv &>/dev/null; then
+        echo "pip install failed (exit $pip_exit), trying uv..."
+        uv pip install -e . 2>&1
+        uv_exit=$?
+        if [ $uv_exit -eq 0 ]; then
+            echo "In-place update complete via uv."
+        else
+            echo "uv install also failed (exit $uv_exit)."
+            exit 1
+        fi
+    else
+        echo "pip install failed (exit $pip_exit) and uv is not available."
+        exit 1
+    fi
 else
     echo "No git repository found; falling back to installer script."
     exit 1
