@@ -551,7 +551,7 @@ function Start-hermes-agent-windowsGui {
         }
 
         # Smart visibility: setup button only before Hermes is installed
-        if ($Summary.HermesStatus -and $Summary.HermesStatus.Status -eq ' Installed') {
+        if ($Summary.HermesStatus -and $Summary.HermesStatus.Status -eq 'Installed') {
             $controls.StartSetupButton.Visibility = 'Collapsed'
         }
         else {
@@ -896,7 +896,7 @@ function Start-hermes-agent-windowsGui {
 
     # Pre-fill model dropdown from cache so it's never empty on launch
     try {
-        $cachedModels = Import-OllamaCloudModels
+        $cachedModels = Get-OllamaCloudModels
         if ($cachedModels.Models) {
             $controls.OllamaModelBox.Items.Clear()
             foreach ($modelName in @($cachedModels.Models)) {
@@ -905,7 +905,7 @@ function Start-hermes-agent-windowsGui {
             if (-not $controls.OllamaModelBox.Text) {
                 $controls.OllamaModelBox.Text = 'kimi-k2.6:cloud'
             }
-            Add-GuiLogLine "Loaded $($cachedModels.Models.Count) cached models."
+            Add-GuiLogLine "Loaded $($cachedModels.Models.Count) models."
         }
     }
     catch {
