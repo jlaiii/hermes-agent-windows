@@ -107,12 +107,17 @@ function Update-HermesAgent {
         return Install-HermesAgent
     }
 
-    $result = Invoke-HermesWslCommand -Command 'hermes update' -AsAdminUser -TimeoutSeconds 900
-    if ($result.Status -eq 'Success') {
-        return Format-StatusResult -Name 'Hermes Update' -Status 'Installed' -Message 'Hermes Agent update command completed in WSL.' -Details $result.Details
+    # hermes CLI may not have a built-in update command; run the official installer script again
+    $result = Invoke-HermesWslCommand -Command 'curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup' -AsAdminUser -TimeoutSeconds 900
+    if ($result.Status -eq 'Success' -and (Test-HermesInstalled)) {
+        return Format-StatusResult -Name 'Hermes Update' -Status 'Installed' -Message 'Hermes Agent was updated in WSL via the official installer.' -Details $result.Details
     }
 
-    return Format-StatusResult -Name 'Hermes Update' -Status 'Error' -Message 'Hermes Agent update command failed in WSL.' -Details $result.Details -ExitCode $result.ExitCode
+    if ($result.Status -eq 'Success') {
+        return Format-StatusResult -Name 'Hermes Update' -Status 'Installed' -Message 'Hermes Agent update completed.' -Details $result.Details
+    }
+
+    return Format-StatusResult -Name 'Hermes Update' -Status 'Error' -Message 'Hermes Agent update failed in WSL.' -Details $result.Details -ExitCode $result.ExitCode
 }
 
 function Start-HermesAgent {
@@ -397,7 +402,7 @@ function Get-HermesReleaseCachePath {
 
 function Get-LatestHermesReleaseVersion {
     $cacheFile = Get-HermesReleaseCachePath
-    $maxAge = [TimeSpan]::FromMinutes(15)
+    $maxAge = [TimeSpan]::FromHours(1)
 
     if (Test-Path $cacheFile) {
         try {

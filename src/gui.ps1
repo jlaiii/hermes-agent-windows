@@ -906,7 +906,6 @@ function Start-hermes-agent-windowsGui {
     Add-GuiLogLine "Loaded $($defaultModels.Count) default models."
 
     Start-StatusCheckJob
-    Start-RefreshOllamaModelsJob
 
     # Make the Updates card clickable when an update is detected
     $controls.UpdatesStatusBorder.Cursor = 'Hand'
@@ -926,5 +925,6 @@ function Start-hermes-agent-windowsGui {
             }
         }
     })
+
     $window.ShowDialog() | Out-Null
 }
