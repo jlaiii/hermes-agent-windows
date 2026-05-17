@@ -29,212 +29,365 @@ function Start-hermes-agent-windowsGui {
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="hermes-agent-windows"
-        Height="760"
-        Width="1180"
-        MinHeight="650"
-        MinWidth="980"
+        Height="800"
+        Width="1260"
+        MinHeight="720"
+        MinWidth="1020"
         WindowStartupLocation="CenterScreen"
-        Background="#14161A"
-        Foreground="#F2F4F8"
-        FontFamily="Segoe UI">
+        Background="#0F1115"
+        Foreground="#E2E5EB"
+        FontFamily="Segoe UI Variable, Segoe UI, Arial">
     <Window.Resources>
-        <SolidColorBrush x:Key="CardBorder" Color="#2B3138" />
-        <SolidColorBrush x:Key="CardFill" Color="#1B1F24" />
-        <SolidColorBrush x:Key="Accent" Color="#4CC2FF" />
-        <SolidColorBrush x:Key="Good" Color="#2ECC71" />
-        <SolidColorBrush x:Key="Warn" Color="#F5A623" />
+        <!-- Brushes -->
+        <SolidColorBrush x:Key="CardBorder" Color="#252A32" />
+        <SolidColorBrush x:Key="CardFill" Color="#171A20" />
+        <SolidColorBrush x:Key="CardFillAlt" Color="#13151A" />
+        <SolidColorBrush x:Key="Accent" Color="#3B82F6" />
+        <SolidColorBrush x:Key="AccentHover" Color="#5A9AF8" />
+        <SolidColorBrush x:Key="AccentGlow" Color="#1E3A5F" />
+        <SolidColorBrush x:Key="Good" Color="#3ECF7A" />
+        <SolidColorBrush x:Key="Warn" Color="#F59E0B" />
         <SolidColorBrush x:Key="Bad" Color="#E74C3C" />
-        <SolidColorBrush x:Key="Muted" Color="#A0A7B4" />
+        <SolidColorBrush x:Key="Muted" Color="#8B919D" />
+        <SolidColorBrush x:Key="MutedBg" Color="#111318" />
+        <SolidColorBrush x:Key="TextMain" Color="#E2E5EB" />
+        <SolidColorBrush x:Key="TextSecondary" Color="#8B919D" />
+
+        <!-- Default Button -->
         <Style TargetType="Button">
             <Setter Property="Margin" Value="3" />
-            <Setter Property="Padding" Value="8,5" />
-            <Setter Property="Background" Value="#263041" />
-            <Setter Property="Foreground" Value="#F2F4F8" />
-            <Setter Property="BorderBrush" Value="#3B4657" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="Background" Value="#1B2130" />
+            <Setter Property="Foreground" Value="#E2E5EB" />
+            <Setter Property="BorderBrush" Value="#2A3242" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="MinHeight" Value="34" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="ToolTipService.ShowDuration" Value="8000" />
         </Style>
+
+        <!-- Primary Button -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Margin" Value="3" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="Background" Value="#3B82F6" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="MinHeight" Value="38" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <!-- Danger Button -->
+        <Style x:Key="DangerButton" TargetType="Button">
+            <Setter Property="Margin" Value="3" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="Background" Value="#3A1515" />
+            <Setter Property="Foreground" Value="#E2E5EB" />
+            <Setter Property="BorderBrush" Value="#5A2525" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="MinHeight" Value="34" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <!-- Ghost Button -->
+        <Style x:Key="GhostButton" TargetType="Button">
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#8B919D" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="MinHeight" Value="26" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
         <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#101215" />
-            <Setter Property="Foreground" Value="#F2F4F8" />
-            <Setter Property="BorderBrush" Value="#2B3138" />
+            <Setter Property="Background" Value="#0E1014" />
+            <Setter Property="Foreground" Value="#E2E5EB" />
+            <Setter Property="BorderBrush" Value="#252A32" />
             <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style TargetType="PasswordBox">
+            <Setter Property="Background" Value="#0E1014" />
+            <Setter Property="Foreground" Value="#E2E5EB" />
+            <Setter Property="BorderBrush" Value="#252A32" />
+            <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="#0E1014" />
+            <Setter Property="Foreground" Value="#111418" />
+            <Setter Property="BorderBrush" Value="#252A32" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#8B919D" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="BorderThickness" Value="0" />
         </Style>
     </Window.Resources>
-    <Grid Margin="14">
+
+    <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="150" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Margin="0,0,0,10">
-            <TextBlock Text="hermes-agent-windows" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC" />
-            <TextBlock Text="Smart Windows Setup Tool for Hermes Agent" FontSize="13" Foreground="#A0A7B4" Margin="0,4,0,0" />
-        </StackPanel>
 
-        <Border Grid.Row="1" Background="#171B20" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,10">
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Button x:Name="StartSetupButton" Content="Start Hermes Agent Setup" Width="205" Height="36" Background="#2D7FF9" />
-                    <Button x:Name="InstallAppButton" Content="Install hermes-agent-windows Shortcut" Width="180" Height="36" />
-                    <Button x:Name="UninstallAppButton" Content="Uninstall Shortcut" Width="140" Height="36" Background="#4A2630" />
-                    <TextBlock x:Name="TopStatusText" VerticalAlignment="Center" Margin="16,0,0,0" Foreground="#A0A7B4" Text="Ready." FontSize="14" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                    <TextBlock Text="Ollama API Key" VerticalAlignment="Center" Foreground="#A0A7B4" Margin="4,0,8,0" />
-                    <PasswordBox x:Name="OllamaApiKeyBox" Width="260" Height="30" Background="#101215" Foreground="#F2F4F8" BorderBrush="#2B3138" />
-                    <TextBlock Text="Model" VerticalAlignment="Center" Foreground="#A0A7B4" Margin="12,0,8,0" />
-                    <ComboBox x:Name="OllamaModelBox" Width="230" Height="30" IsEditable="True" Text="kimi-k2.6:cloud" Background="#101215" Foreground="#111418" />
-                    <Button x:Name="SaveOllamaCloudButton" Content="Save Cloud API" Width="120" Height="30" />
-                    <Button x:Name="RefreshOllamaModelsButton" Content="Refresh Models" Width="120" Height="30" />
-                    <Button x:Name="TestOllamaCloudButton" Content="Test Cloud API" Width="120" Height="30" />
-                </StackPanel>
+        <!-- Header -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,14">
+            <StackPanel DockPanel.Dock="Left">
+                <TextBlock Text="hermes-agent-windows" FontSize="24" FontWeight="Bold" Foreground="#F8FAFC" />
+                <TextBlock Text="Smart Windows Setup Tool for Hermes Agent" FontSize="13" Foreground="#8B919D" Margin="0,2,0,0" />
             </StackPanel>
-        </Border>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <ProgressBar x:Name="MainProgressBar" Width="180" Height="6" Background="#1C2028" Foreground="#3B82F6"
+                             BorderThickness="0" IsIndeterminate="False" Margin="0,0,12,0" Visibility="Collapsed" />
+                <TextBlock x:Name="TopStatusText" VerticalAlignment="Center" Foreground="#8B919D" Text="Ready." FontSize="13" />
+            </StackPanel>
+        </DockPanel>
 
-        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxHeight="270">
-            <UniformGrid Columns="3" Rows="5" Margin="0,0,0,8">
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="hermes-agent-windows App" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="AppStatusValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="AppStatusDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="Admin Check" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="AdminValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="AdminDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="Windows Version" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="WindowsValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="WindowsDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="PowerShell Version" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="PowerShellValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="PowerShellDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="WSL Status" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="WslStatusValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="WslStatusDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="WSL Distro" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="WslDistroValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="WslDistroDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="WSL Account" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="WslAccountValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="WslAccountDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="Ollama Status" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="OllamaStatusValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="OllamaStatusDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="Ollama Version" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="OllamaVersionValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="OllamaVersionDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="Hermes Agent Status" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="HermesStatusValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="HermesStatusDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="Hermes Agent Version" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="HermesVersionValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="HermesVersionDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="Hermes Gateway" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="GatewayValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="GatewayDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource CardFill}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="8" Margin="0,0,8,8" Padding="9">
-                    <StackPanel>
-                        <TextBlock Text="Updates" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
-                        <TextBlock x:Name="UpdatesValue" Text="Unknown" FontSize="16" FontWeight="Bold" Margin="0,4,0,0" />
-                        <TextBlock x:Name="UpdatesDetail" Text="Waiting for status check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="11" MaxHeight="42" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Border>
-            </UniformGrid>
-        </ScrollViewer>
-
-        <Border Grid.Row="3" Background="#111418" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,10" MinHeight="150">
+        <!-- Primary Action + API Row -->
+        <Border Grid.Row="1" Background="#171B20" BorderBrush="#252A32" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,14">
             <DockPanel>
-                <TextBlock Text="Live Log" DockPanel.Dock="Top" FontSize="13" FontWeight="SemiBold" Foreground="#A0A7B4" Margin="0,0,0,6" />
-                <TextBox x:Name="LogBox"
-                         AcceptsReturn="True"
-                         IsReadOnly="True"
-                         TextWrapping="Wrap"
-                         VerticalScrollBarVisibility="Auto"
-                         HorizontalScrollBarVisibility="Auto"
-                         FontSize="12" />
+                <DockPanel DockPanel.Dock="Left">
+                    <Button x:Name="StartSetupButton" Content="Start Hermes Agent Setup" Width="220" Height="42"
+                            Style="{StaticResource PrimaryButton}"
+                            ToolTip="Run the full automated setup: WSL, account, Ollama, Hermes Agent, and Gateway." />
+                    <Button x:Name="CheckStatusButton" Content="Check Status" Width="120" Height="36" Margin="8,0,0,0"
+                            ToolTip="Refresh all status cards and system component checks." />
+                </DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="Ollama API Key" VerticalAlignment="Center" Foreground="#8B919D" Margin="0,0,10,0" FontSize="11" />
+                    <PasswordBox x:Name="OllamaApiKeyBox" Width="240" Height="32"
+                                 ToolTip="Paste your Ollama cloud API key here, then click Save." />
+                    <TextBlock Text="Model" VerticalAlignment="Center" Foreground="#8B919D" Margin="12,0,10,0" FontSize="11" />
+                    <ComboBox x:Name="OllamaModelBox" Width="210" Height="32" IsEditable="True" Text="kimi-k2.6:cloud"
+                              ToolTip="Select or type the Ollama cloud model to use." />
+                    <Button x:Name="SaveOllamaCloudButton" Content="Save Key" Width="90" Height="32" Margin="4,0,0,0"
+                            ToolTip="Save the API key and model in WSL and Hermes config files." />
+                    <Button x:Name="RefreshOllamaModelsButton" Content="Refresh Models" Width="110" Height="32" Margin="4,0,0,0"
+                            ToolTip="Fetch the latest Ollama model list from ollama.com." />
+                    <Button x:Name="TestOllamaCloudButton" Content="Test API" Width="90" Height="32" Margin="4,0,0,0"
+                            ToolTip="Send a test request to verify the API key works." />
+                </StackPanel>
             </DockPanel>
         </Border>
 
-        <Border Grid.Row="4" Background="#171B20" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Padding="8">
-            <DockPanel LastChildFill="True">
-                <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
-                    <TextBlock x:Name="BottomStatus" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,4,0,0" Foreground="#A0A7B4" FontSize="12" />
-                    <Button x:Name="GitHubButton" Content="Built by jlaiii" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,4,4,0" Background="Transparent" BorderBrush="Transparent" Foreground="#607080" FontSize="11" FontFamily="Consolas" Padding="3,1" />
+        <!-- Status Cards + Live Log -->
+        <Grid Grid.Row="3" Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.4*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Status Cards -->
+            <Border Grid.Column="0" Background="#171B20" BorderBrush="#252A32" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,0,8,0">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <UniformGrid Columns="4" Margin="0,0,0,4">
+                        <Border x:Name="AppStatusBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="App Shortcut" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="AppStatusValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="AppStatusDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="AdminStatusBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Admin Rights" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="AdminValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="AdminDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="WindowsStatusBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Windows" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="WindowsValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="WindowsDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="PowerShellStatusBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="PowerShell" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="PowerShellValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="PowerShellDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="WslStatusBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="WSL" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="WslStatusValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="WslStatusDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="WslDistroBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="WSL Distro" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="WslDistroValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="WslDistroDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="WslAccountBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="WSL Account" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="WslAccountValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="WslAccountDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="OllamaStatusBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Ollama Status" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="OllamaStatusValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="OllamaStatusDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="OllamaVersionBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Ollama Version" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="OllamaVersionValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="OllamaVersionDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="HermesStatusBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Hermes Status" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="HermesStatusValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="HermesStatusDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="HermesVersionBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Hermes Version" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="HermesVersionValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="HermesVersionDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="GatewayStatusBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Gateway" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="GatewayValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="GatewayDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="UpdatesStatusBorder" Background="{StaticResource CardFillAlt}" BorderBrush="#2B3138" BorderThickness="1" CornerRadius="8" Margin="0,0,6,6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Updates" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="SemiBold" />
+                                <TextBlock x:Name="UpdatesValue" Text="Unknown" FontSize="15" FontWeight="Bold" Margin="0,3,0,0" />
+                                <TextBlock x:Name="UpdatesDetail" Text="Waiting for check." Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="10" MaxHeight="38" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Live Log -->
+            <Border Grid.Column="1" Background="#171B20" BorderBrush="#252A32" BorderThickness="1" CornerRadius="10" Padding="10">
+                <DockPanel>
+                    <TextBlock Text="Live Log" DockPanel.Dock="Top" FontSize="12" FontWeight="SemiBold" Foreground="#8B919D" Margin="0,0,0,6" />
+                    <TextBox x:Name="LogBox"
+                             AcceptsReturn="True"
+                             IsReadOnly="True"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             HorizontalScrollBarVisibility="Auto"
+                             FontSize="11.5"
+                             Background="#111318" />
                 </DockPanel>
-                <WrapPanel VerticalAlignment="Top">
-                <Button x:Name="CheckStatusButton" Content="Check Status" />
-                <Button x:Name="InstallWslButton" Content="Install WSL" />
-                <Button x:Name="RestartWslButton" Content="Restart WSL" />
-                <Button x:Name="AdminAccountButton" Content="Create/Reset WSL Admin" />
-                <Button x:Name="InstallOllamaButton" Content="Install Ollama in WSL" />
-                <Button x:Name="StartOllamaButton" Content="Start Ollama" />
-                <Button x:Name="InstallHermesButton" Content="Install Hermes in WSL" />
-                <Button x:Name="UpdateHermesButton" Content="Update Hermes Agent" />
-                <Button x:Name="HermesDoctorButton" Content="Hermes Doctor" />
-                <Button x:Name="LaunchHermesCliButton" Content="Launch Hermes CLI" />
-                <Button x:Name="EnableGatewayButton" Content="Enable Gateway" />
-                <Button x:Name="OpenGatewayButton" Content="Open Dashboard" />
-                <Button x:Name="StartHermesButton" Content="Start Hermes Agent" />
-                <Button x:Name="StopHermesButton" Content="Stop Hermes Agent" />
-                <Button x:Name="RestartHermesButton" Content="Restart Hermes Agent" />
-                <Button x:Name="CleanHermesButton" Content="Clean Hermes WSL Files" />
-                <Button x:Name="ReinstallWslButton" Content="Reinstall WSL" Background="#5A2A1A" />
-                <Button x:Name="WipeWslButton" Content="Wipe WSL" Background="#6B1F1F" />
-                <Button x:Name="OpenConfigButton" Content="Open Config Folder" />
-                <Button x:Name="OpenLogsButton" Content="Open Logs Folder" />
-                <Button x:Name="ExitButton" Content="Exit" />
-                </WrapPanel>
-            </DockPanel>
-        </Border>
+            </Border>
+        </Grid>
+
+        <!-- Bottom Tab Actions -->
+        <TabControl Grid.Row="4" Background="Transparent">
+            <TabItem Header="Setup" ToolTip="Installation and update actions.">
+                <Border Background="#171B20" BorderBrush="#252A32" BorderThickness="1" CornerRadius="0,0,10,10" Padding="10" Margin="0,-1,0,0">
+                    <WrapPanel>
+                        <Button x:Name="InstallHermesButton" Content="Install Hermes Agent"
+                                ToolTip="Download and install Hermes Agent inside WSL using the official Nous Research installer." />
+                        <Button x:Name="UpdateHermesButton" Content="Update Hermes Agent"
+                                ToolTip="Update the existing Hermes Agent installation inside WSL." />
+                        <Button x:Name="HermesDoctorButton" Content="Hermes Doctor"
+                                ToolTip="Run Hermes Agent health checks to diagnose common issues." />
+                        <Button x:Name="InstallOllamaButton" Content="Install Ollama in WSL"
+                                ToolTip="Install the Ollama server inside WSL." />
+                        <Button x:Name="StartOllamaButton" Content="Start Ollama"
+                                ToolTip="Start the Ollama server inside WSL and verify it responds." />
+                        <Button x:Name="LaunchHermesCliButton" Content="Launch Hermes CLI"
+                                ToolTip="Open a Windows Command Prompt with the Hermes Agent CLI ready inside WSL." />
+                    </WrapPanel>
+                </Border>
+            </TabItem>
+            <TabItem Header="Services" ToolTip="Start, stop, and control Hermes services.">
+                <Border Background="#171B20" BorderBrush="#252A32" BorderThickness="1" CornerRadius="0,0,10,10" Padding="10" Margin="0,-1,0,0">
+                    <WrapPanel>
+                        <Button x:Name="StartHermesButton" Content="Start Hermes Agent"
+                                ToolTip="Start the Hermes Agent service inside WSL." />
+                        <Button x:Name="StopHermesButton" Content="Stop Hermes Agent"
+                                ToolTip="Stop the running Hermes Agent service inside WSL." />
+                        <Button x:Name="RestartHermesButton" Content="Restart Hermes Agent"
+                                ToolTip="Restart the Hermes Agent service to apply config changes." />
+                        <Button x:Name="EnableGatewayButton" Content="Enable Gateway"
+                                ToolTip="Start the Hermes Gateway inside WSL." />
+                        <Button x:Name="OpenGatewayButton" Content="Open Dashboard"
+                                ToolTip="Open the Hermes web dashboard in your default browser at localhost:9119." />
+                    </WrapPanel>
+                </Border>
+            </TabItem>
+            <TabItem Header="WSL" ToolTip="WSL installation, restart, and reset operations.">
+                <Border Background="#171B20" BorderBrush="#252A32" BorderThickness="1" CornerRadius="0,0,10,10" Padding="10" Margin="0,-1,0,0">
+                    <WrapPanel>
+                        <Button x:Name="InstallWslButton" Content="Install WSL"
+                                ToolTip="Install Windows Subsystem for Linux if it is missing on this machine." />
+                        <Button x:Name="RestartWslButton" Content="Restart WSL"
+                                ToolTip="Restart the default WSL distro to clear memory or fix a stuck state." />
+                        <Button x:Name="AdminAccountButton" Content="Create/Reset WSL Admin"
+                                ToolTip="Create or reset a helper account named admin with password admin inside WSL." />
+                        <Button x:Name="ReinstallWslButton" Content="Reinstall Default Distro"
+                                Style="{DynamicResource DangerButton}"
+                                ToolTip="Unregister and reinstall the default WSL distro. Requires backup first due to possible data loss." />
+                        <Button x:Name="WipeWslButton" Content="Wipe WSL"
+                                Style="{DynamicResource DangerButton}"
+                                ToolTip="DANGER: Completely unregister and delete the default WSL distro. Data cannot be recovered." />
+                        <Button x:Name="CleanHermesButton" Content="Clean Hermes WSL Files"
+                                Style="{DynamicResource DangerButton}"
+                                ToolTip="Remove only Hermes user files inside WSL. Does not wipe the entire WSL distro." />
+                    </WrapPanel>
+                </Border>
+            </TabItem>
+            <TabItem Header="Config" ToolTip="Shortcuts, folders, and system configuration.">
+                <Border Background="#171B20" BorderBrush="#252A32" BorderThickness="1" CornerRadius="0,0,10,10" Padding="10" Margin="0,-1,0,0">
+                    <WrapPanel>
+                        <Button x:Name="InstallAppButton" Content="Install Shortcut"
+                                ToolTip="Add Desktop and Start Menu shortcuts to reopen this GUI anytime." />
+                        <Button x:Name="UninstallAppButton" Content="Uninstall Shortcut"
+                                ToolTip="Remove the Desktop and Start Menu shortcuts for this tool." />
+                        <Button x:Name="OpenConfigButton" Content="Open Config Folder"
+                                ToolTip="Open the Hermes configuration folder inside WSL in Windows Explorer." />
+                        <Button x:Name="OpenLogsButton" Content="Open Logs Folder"
+                                ToolTip="Open the local application logs folder in Windows Explorer." />
+                        <Button x:Name="GitHubButton" Content="Built by jlaiii"
+                                Style="{DynamicResource GhostButton}"
+                                ToolTip="Open the project GitHub page in your browser." />
+                        <Button x:Name="ExitButton" Content="Exit"
+                                Style="{DynamicResource GhostButton}"
+                                ToolTip="Close this window. All running WSL services remain active." />
+                    </WrapPanel>
+                </Border>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
 "@
@@ -252,32 +405,46 @@ function Start-hermes-agent-windowsGui {
         RefreshOllamaModelsButton = $window.FindName('RefreshOllamaModelsButton')
         TestOllamaCloudButton = $window.FindName('TestOllamaCloudButton')
         TopStatusText       = $window.FindName('TopStatusText')
+        MainProgressBar     = $window.FindName('MainProgressBar')
         AppStatusValue      = $window.FindName('AppStatusValue')
         AppStatusDetail     = $window.FindName('AppStatusDetail')
+        AppStatusBorder     = $window.FindName('AppStatusBorder')
         AdminValue          = $window.FindName('AdminValue')
         AdminDetail         = $window.FindName('AdminDetail')
+        AdminStatusBorder   = $window.FindName('AdminStatusBorder')
         WindowsValue        = $window.FindName('WindowsValue')
         WindowsDetail       = $window.FindName('WindowsDetail')
+        WindowsStatusBorder = $window.FindName('WindowsStatusBorder')
         PowerShellValue     = $window.FindName('PowerShellValue')
         PowerShellDetail    = $window.FindName('PowerShellDetail')
+        PowerShellStatusBorder = $window.FindName('PowerShellStatusBorder')
         WslStatusValue      = $window.FindName('WslStatusValue')
         WslStatusDetail     = $window.FindName('WslStatusDetail')
+        WslStatusBorder     = $window.FindName('WslStatusBorder')
         WslDistroValue      = $window.FindName('WslDistroValue')
         WslDistroDetail     = $window.FindName('WslDistroDetail')
+        WslDistroBorder     = $window.FindName('WslDistroBorder')
         WslAccountValue     = $window.FindName('WslAccountValue')
         WslAccountDetail    = $window.FindName('WslAccountDetail')
+        WslAccountBorder    = $window.FindName('WslAccountBorder')
         OllamaStatusValue   = $window.FindName('OllamaStatusValue')
         OllamaStatusDetail  = $window.FindName('OllamaStatusDetail')
+        OllamaStatusBorder  = $window.FindName('OllamaStatusBorder')
         OllamaVersionValue  = $window.FindName('OllamaVersionValue')
         OllamaVersionDetail = $window.FindName('OllamaVersionDetail')
+        OllamaVersionBorder = $window.FindName('OllamaVersionBorder')
         HermesStatusValue   = $window.FindName('HermesStatusValue')
         HermesStatusDetail  = $window.FindName('HermesStatusDetail')
+        HermesStatusBorder  = $window.FindName('HermesStatusBorder')
         HermesVersionValue  = $window.FindName('HermesVersionValue')
         HermesVersionDetail = $window.FindName('HermesVersionDetail')
+        HermesVersionBorder = $window.FindName('HermesVersionBorder')
         GatewayValue        = $window.FindName('GatewayValue')
         GatewayDetail       = $window.FindName('GatewayDetail')
+        GatewayStatusBorder = $window.FindName('GatewayStatusBorder')
         UpdatesValue        = $window.FindName('UpdatesValue')
         UpdatesDetail       = $window.FindName('UpdatesDetail')
+        UpdatesStatusBorder = $window.FindName('UpdatesStatusBorder')
         LogBox              = $window.FindName('LogBox')
         CheckStatusButton   = $window.FindName('CheckStatusButton')
         InstallWslButton    = $window.FindName('InstallWslButton')
@@ -301,7 +468,6 @@ function Start-hermes-agent-windowsGui {
         OpenLogsButton      = $window.FindName('OpenLogsButton')
         ExitButton          = $window.FindName('ExitButton')
         GitHubButton        = $window.FindName('GitHubButton')
-        BottomStatus        = $window.FindName('BottomStatus')
     }
 
     $script:GuiState = @{
@@ -331,6 +497,7 @@ function Start-hermes-agent-windowsGui {
         param(
             [System.Windows.Controls.TextBlock]$ValueControl,
             [System.Windows.Controls.TextBlock]$DetailControl,
+            [System.Windows.Controls.Border]$BorderControl = $null,
             [string]$Status,
             [string]$Message,
             [string]$Details
@@ -339,15 +506,30 @@ function Start-hermes-agent-windowsGui {
         $ValueControl.Text = if ($Status) { $Status } else { 'Unknown' }
         $DetailControl.Text = if ($Details) { "$Message`n$Details" } else { $Message }
 
-        switch ($Status) {
-            'Installed' { $ValueControl.Foreground = [System.Windows.Media.Brushes]::LightGreen }
-            'Running' { $ValueControl.Foreground = [System.Windows.Media.Brushes]::LightGreen }
-            'Stopped' { $ValueControl.Foreground = [System.Windows.Media.Brushes]::Khaki }
-            'Missing' { $ValueControl.Foreground = [System.Windows.Media.Brushes]::OrangeRed }
-            'Needs Update' { $ValueControl.Foreground = [System.Windows.Media.Brushes]::Gold }
-            'NeedsReboot' { $ValueControl.Foreground = [System.Windows.Media.Brushes]::LightSalmon }
-            'Error' { $ValueControl.Foreground = [System.Windows.Media.Brushes]::Tomato }
-            default { $ValueControl.Foreground = [System.Windows.Media.Brushes]::LightGray }
+        $statusColor = switch ($Status) {
+            'Installed' { [System.Windows.Media.Brushes]::LightGreen }
+            'Running' { [System.Windows.Media.Brushes]::LightGreen }
+            'Stopped' { [System.Windows.Media.Brushes]::Khaki }
+            'Missing' { [System.Windows.Media.Brushes]::OrangeRed }
+            'Needs Update' { [System.Windows.Media.Brushes]::Gold }
+            'NeedsReboot' { [System.Windows.Media.Brushes]::LightSalmon }
+            'Error' { [System.Windows.Media.Brushes]::Tomato }
+            default { [System.Windows.Media.Brushes]::LightGray }
+        }
+        $ValueControl.Foreground = $statusColor
+
+        if ($BorderControl) {
+            $borderBrush = switch ($Status) {
+                'Installed' { [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromArgb(255, 35, 100, 60)) }
+                'Running'   { [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromArgb(255, 35, 100, 60)) }
+                'Stopped'   { [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromArgb(255, 100, 90, 40)) }
+                'Missing'   { [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromArgb(255, 120, 50, 40)) }
+                'Needs Update' { [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromArgb(255, 120, 100, 40)) }
+                'NeedsReboot' { [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromArgb(255, 140, 100, 70)) }
+                'Error'     { [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromArgb(255, 140, 50, 40)) }
+                default     { $BorderControl.BorderBrush }
+            }
+            $BorderControl.BorderBrush = $borderBrush
         }
     }
 
@@ -355,21 +537,20 @@ function Start-hermes-agent-windowsGui {
         param([pscustomobject]$Summary)
         if (-not $Summary) { return }
 
-        Set-StatusVisual $controls.AppStatusValue $controls.AppStatusDetail $Summary.AppStatus.Status $Summary.AppStatus.Message $Summary.AppStatus.Details
-        Set-StatusVisual $controls.AdminValue $controls.AdminDetail $Summary.AdminCheck.Status $Summary.AdminCheck.Message $Summary.AdminCheck.Details
-        Set-StatusVisual $controls.WindowsValue $controls.WindowsDetail $Summary.WindowsVersion.Status $Summary.WindowsVersion.Message ($Summary.WindowsVersion.Message)
-        Set-StatusVisual $controls.PowerShellValue $controls.PowerShellDetail $Summary.PowerShellVersion.Status $Summary.PowerShellVersion.Message ($Summary.PowerShellVersion.Message)
-        Set-StatusVisual $controls.WslStatusValue $controls.WslStatusDetail $Summary.WslStatus.Status $Summary.WslStatus.Message $Summary.WslStatus.Details
-        Set-StatusVisual $controls.WslDistroValue $controls.WslDistroDetail $Summary.WslDistro.Status $Summary.WslDistro.Message $Summary.WslDistro.Details
-        Set-StatusVisual $controls.WslAccountValue $controls.WslAccountDetail $Summary.WslAccount.Status $Summary.WslAccount.Message $Summary.WslAccount.Details
-        Set-StatusVisual $controls.OllamaStatusValue $controls.OllamaStatusDetail $Summary.OllamaStatus.Status $Summary.OllamaStatus.Message $Summary.OllamaStatus.Details
-        Set-StatusVisual $controls.OllamaVersionValue $controls.OllamaVersionDetail $Summary.OllamaVersion.Status $Summary.OllamaVersion.Message $Summary.OllamaVersion.Details
-        Set-StatusVisual $controls.HermesStatusValue $controls.HermesStatusDetail $Summary.HermesStatus.Status $Summary.HermesStatus.Message $Summary.HermesStatus.Details
-        Set-StatusVisual $controls.HermesVersionValue $controls.HermesVersionDetail $Summary.HermesVersion.Status $Summary.HermesVersion.Message $Summary.HermesVersion.Details
-        Set-StatusVisual $controls.GatewayValue $controls.GatewayDetail $Summary.GatewayStatus.Status $Summary.GatewayStatus.Message $Summary.GatewayStatus.Details
-        Set-StatusVisual $controls.UpdatesValue $controls.UpdatesDetail $Summary.Updates.Status $Summary.Updates.Message $Summary.Updates.Details
-        $controls.BottomStatus.Text = $Summary.Summary
-        $controls.TopStatusText.Text = 'Status refreshed.'
+        Set-StatusVisual $controls.AppStatusValue $controls.AppStatusDetail $controls.AppStatusBorder $Summary.AppStatus.Status $Summary.AppStatus.Message $Summary.AppStatus.Details
+        Set-StatusVisual $controls.AdminValue $controls.AdminDetail $controls.AdminStatusBorder $Summary.AdminCheck.Status $Summary.AdminCheck.Message $Summary.AdminCheck.Details
+        Set-StatusVisual $controls.WindowsValue $controls.WindowsDetail $controls.WindowsStatusBorder $Summary.WindowsVersion.Status $Summary.WindowsVersion.Message ($Summary.WindowsVersion.Message)
+        Set-StatusVisual $controls.PowerShellValue $controls.PowerShellDetail $controls.PowerShellStatusBorder $Summary.PowerShellVersion.Status $Summary.PowerShellVersion.Message ($Summary.PowerShellVersion.Message)
+        Set-StatusVisual $controls.WslStatusValue $controls.WslStatusDetail $controls.WslStatusBorder $Summary.WslStatus.Status $Summary.WslStatus.Message $Summary.WslStatus.Details
+        Set-StatusVisual $controls.WslDistroValue $controls.WslDistroDetail $controls.WslDistroBorder $Summary.WslDistro.Status $Summary.WslDistro.Message $Summary.WslDistro.Details
+        Set-StatusVisual $controls.WslAccountValue $controls.WslAccountDetail $controls.WslAccountBorder $Summary.WslAccount.Status $Summary.WslAccount.Message $Summary.WslAccount.Details
+        Set-StatusVisual $controls.OllamaStatusValue $controls.OllamaStatusDetail $controls.OllamaStatusBorder $Summary.OllamaStatus.Status $Summary.OllamaStatus.Message $Summary.OllamaStatus.Details
+        Set-StatusVisual $controls.OllamaVersionValue $controls.OllamaVersionDetail $controls.OllamaVersionBorder $Summary.OllamaVersion.Status $Summary.OllamaVersion.Message $Summary.OllamaVersion.Details
+        Set-StatusVisual $controls.HermesStatusValue $controls.HermesStatusDetail $controls.HermesStatusBorder $Summary.HermesStatus.Status $Summary.HermesStatus.Message $Summary.HermesStatus.Details
+        Set-StatusVisual $controls.HermesVersionValue $controls.HermesVersionDetail $controls.HermesVersionBorder $Summary.HermesVersion.Status $Summary.HermesVersion.Message $Summary.HermesVersion.Details
+        Set-StatusVisual $controls.GatewayValue $controls.GatewayDetail $controls.GatewayStatusBorder $Summary.GatewayStatus.Status $Summary.GatewayStatus.Message $Summary.GatewayStatus.Details
+        Set-StatusVisual $controls.UpdatesValue $controls.UpdatesDetail $controls.UpdatesStatusBorder $Summary.Updates.Status $Summary.Updates.Message $Summary.Updates.Details
+        $controls.TopStatusText.Text = $Summary.Summary
     }
 
     function Refresh-AppLogTail {
@@ -407,7 +588,8 @@ function Start-hermes-agent-windowsGui {
 
         Write-AppLog -Message "Starting task: $TaskName" -Level 'INFO' | Out-Null
         $controls.TopStatusText.Text = "$TaskName in progress..."
-        $controls.BottomStatus.Text = "$TaskName started."
+        $controls.MainProgressBar.Visibility = 'Visible'
+        $controls.MainProgressBar.IsIndeterminate = $true
 
         $job = Start-Job -Name $TaskName -ArgumentList $script:GuiState.ProjectRoot, $FunctionName, $FunctionArguments -ScriptBlock {
             param($root, $funcName, $funcArgs)
@@ -523,6 +705,7 @@ function Start-hermes-agent-windowsGui {
     $timer.Add_Tick({
         Refresh-AppLogTail
 
+        $hasActiveJob = $false
         foreach ($entry in @($script:GuiState.Jobs.GetEnumerator())) {
             $taskName = $entry.Key
             $job = $entry.Value
@@ -575,6 +758,14 @@ function Start-hermes-agent-windowsGui {
                     $script:GuiState.Jobs.Remove($taskName) | Out-Null
                 }
             }
+            else {
+                $hasActiveJob = $true
+            }
+        }
+
+        if (-not $hasActiveJob) {
+            $controls.MainProgressBar.Visibility = 'Collapsed'
+            $controls.MainProgressBar.IsIndeterminate = $false
         }
     })
     $timer.Start()
@@ -697,4 +888,3 @@ function Start-hermes-agent-windowsGui {
     })
     $window.ShowDialog() | Out-Null
 }
-
