@@ -170,6 +170,13 @@ function Start-hermes-agent-windowsGui {
                             ToolTip="Run the full automated setup: WSL, account, Ollama, Hermes Agent, and Gateway." />
                     <Button x:Name="CheckStatusButton" Content="Check Status" Width="120" Height="36" Margin="8,0,0,0"
                             ToolTip="Refresh all status cards and system component checks." />
+                    <Button x:Name="InstallShortcutButton" Content="Install Shortcut" Width="130" Height="36" Margin="8,0,0,0"
+                            ToolTip="Add Desktop and Start Menu .bat shortcuts that auto-update from GitHub." />
+                    <Button x:Name="UninstallShortcutButton" Content="Uninstall Shortcut" Width="140" Height="36" Margin="8,0,0,0"
+                            ToolTip="Remove the .bat shortcuts from Desktop and Start Menu." Visibility="Collapsed" />
+                    <Button x:Name="LaunchHermesCliButton" Content="Launch Hermes CLI" Width="140" Height="36" Margin="8,0,0,0"
+                            Style="{StaticResource PrimaryButton}"
+                            ToolTip="Open a Windows Command Prompt with the Hermes Agent CLI ready inside WSL." />
                 </DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <TextBlock Text="Ollama API Key" VerticalAlignment="Center" Foreground="#8B919D" Margin="0,0,10,0" FontSize="11" />
@@ -325,8 +332,6 @@ function Start-hermes-agent-windowsGui {
                                 ToolTip="Install the Ollama server inside WSL." />
                         <Button x:Name="StartOllamaButton" Content="Start Ollama"
                                 ToolTip="Start the Ollama server inside WSL and verify it responds." />
-                        <Button x:Name="LaunchHermesCliButton" Content="Launch Hermes CLI"
-                                ToolTip="Open a Windows Command Prompt with the Hermes Agent CLI ready inside WSL." />
                     </WrapPanel>
                 </Border>
             </TabItem>
@@ -370,10 +375,6 @@ function Start-hermes-agent-windowsGui {
             <TabItem Header="Config" ToolTip="Shortcuts, folders, and system configuration.">
                 <Border Background="#171B20" BorderBrush="#252A32" BorderThickness="1" CornerRadius="0,0,10,10" Padding="10" Margin="0,-1,0,0">
                     <WrapPanel>
-                        <Button x:Name="InstallAppButton" Content="Install Shortcut"
-                                ToolTip="Add Desktop and Start Menu shortcuts to reopen this GUI anytime." />
-                        <Button x:Name="UninstallAppButton" Content="Uninstall Shortcut"
-                                ToolTip="Remove the Desktop and Start Menu shortcuts for this tool." />
                         <Button x:Name="OpenConfigButton" Content="Open Config Folder"
                                 ToolTip="Open the Hermes configuration folder inside WSL in Windows Explorer." />
                         <Button x:Name="OpenLogsButton" Content="Open Logs Folder"
@@ -397,8 +398,8 @@ function Start-hermes-agent-windowsGui {
 
     $controls = @{
         StartSetupButton    = $window.FindName('StartSetupButton')
-        InstallAppButton    = $window.FindName('InstallAppButton')
-        UninstallAppButton  = $window.FindName('UninstallAppButton')
+        InstallShortcutButton = $window.FindName('InstallShortcutButton')
+        UninstallShortcutButton = $window.FindName('UninstallShortcutButton')
         OllamaApiKeyBox     = $window.FindName('OllamaApiKeyBox')
         OllamaModelBox      = $window.FindName('OllamaModelBox')
         SaveOllamaCloudButton = $window.FindName('SaveOllamaCloudButton')
@@ -538,6 +539,24 @@ function Start-hermes-agent-windowsGui {
         if (-not $Summary) { return }
 
         Set-StatusVisual $controls.AppStatusValue $controls.AppStatusDetail $controls.AppStatusBorder $Summary.AppStatus.Status $Summary.AppStatus.Message $Summary.AppStatus.Details
+
+        # Smart visibility: shortcut buttons
+        if ($Summary.AppStatus -and $Summary.AppStatus.Status -eq 'Installed') {
+            $controls.InstallShortcutButton.Visibility  = 'Collapsed'
+            $controls.UninstallShortcutButton.Visibility = 'Visible'
+        }
+        else {
+            $controls.InstallShortcutButton.Visibility  = 'Visible'
+            $controls.UninstallShortcutButton.Visibility = 'Collapsed'
+        }
+
+        # Smart visibility: setup button only before Hermes is installed
+        if ($Summary.HermesStatus -and $Summary.HermesStatus.Status -eq ' Installed') {
+            $controls.StartSetupButton.Visibility = 'Collapsed'
+        }
+        else {
+            $controls.StartSetupButton.Visibility = 'Visible'
+        }
         Set-StatusVisual $controls.AdminValue $controls.AdminDetail $controls.AdminStatusBorder $Summary.AdminCheck.Status $Summary.AdminCheck.Message $Summary.AdminCheck.Details
         Set-StatusVisual $controls.WindowsValue $controls.WindowsDetail $controls.WindowsStatusBorder $Summary.WindowsVersion.Status $Summary.WindowsVersion.Message ($Summary.WindowsVersion.Message)
         Set-StatusVisual $controls.PowerShellValue $controls.PowerShellDetail $controls.PowerShellStatusBorder $Summary.PowerShellVersion.Status $Summary.PowerShellVersion.Message ($Summary.PowerShellVersion.Message)
@@ -773,10 +792,10 @@ function Start-hermes-agent-windowsGui {
     $controls.StartSetupButton.Add_Click({
         Start-GuidedSetup
     })
-    $controls.InstallAppButton.Add_Click({
+    $controls.InstallShortcutButton.Add_Click({
         Start-InstallAppJob
     })
-    $controls.UninstallAppButton.Add_Click({
+    $controls.UninstallShortcutButton.Add_Click({
         $choice = [System.Windows.MessageBox]::Show('Remove the hermes-agent-windows Desktop and Start Menu shortcuts? This will not delete the project folder or WSL data.', 'hermes-agent-windows', [System.Windows.MessageBoxButton]::YesNo, [System.Windows.MessageBoxImage]::Question)
         if ($choice -eq [System.Windows.MessageBoxResult]::Yes) { Start-UninstallAppJob }
     })
