@@ -894,22 +894,16 @@ function Start-hermes-agent-windowsGui {
 
     Add-GuiLogLine 'hermes-agent-windows GUI started.'
 
-    # Pre-fill model dropdown from cache so it's never empty on launch
-    try {
-        $cachedModels = Get-OllamaCloudModels
-        if ($cachedModels.Models) {
-            $controls.OllamaModelBox.Items.Clear()
-            foreach ($modelName in @($cachedModels.Models)) {
-                [void]$controls.OllamaModelBox.Items.Add($modelName)
-            }
-            if (-not $controls.OllamaModelBox.Text) {
-                $controls.OllamaModelBox.Text = 'kimi-k2.6:cloud'
-            }
-            Add-GuiLogLine "Loaded $($cachedModels.Models.Count) models."
-        }
+    # Pre-fill model dropdown with default models so it's never empty on launch
+    $defaultModels = @('kimi-k2.6:cloud', 'qwen3:cloud', 'qwq:cloud', 'gemma3:cloud', 'mistral-small:cloud', 'llama3.3:cloud', 'qwen2.5:cloud', 'deepseek-r1:cloud', 'phi4:cloud', 'granite3.2:cloud')
+    $controls.OllamaModelBox.Items.Clear()
+    foreach ($modelName in $defaultModels) {
+        [void]$controls.OllamaModelBox.Items.Add($modelName)
     }
-    catch {
+    if ([string]::IsNullOrWhiteSpace($controls.OllamaModelBox.Text)) {
+        $controls.OllamaModelBox.Text = 'kimi-k2.6:cloud'
     }
+    Add-GuiLogLine "Loaded $($defaultModels.Count) default models."
 
     Start-StatusCheckJob
     Start-RefreshOllamaModelsJob
