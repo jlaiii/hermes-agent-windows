@@ -43,7 +43,15 @@ function Get-HermesVersion {
 
     $result = Invoke-HermesWslCommand -Command 'hermes --version' -AsAdminUser -TimeoutSeconds 60
     if ($result.Status -eq 'Success') {
-        return Format-StatusResult -Name 'Hermes Agent Version' -Status 'Installed' -Message 'Hermes Agent version retrieved from WSL.' -Details $result.Details
+        $details = $result.Details
+        $configAge = Invoke-HermesWslCommand -Command 'test -f "$HOME/.hermes/config.yaml" && stat -c "%Y" "$HOME/.hermes/config.yaml" || echo ""' -AsAdminUser -TimeoutSeconds 15
+        if ($configAge.Status -eq 'Success' -and $configAge.Details -match '^\d+$') {
+            $epoch = [int]$configAge.Details.Trim()
+            $configDate = [DateTimeOffset]::FromUnixTimeSeconds($epoch).LocalDateTime
+            $ageText = if ($configDate -gt (Get-Date).AddMinutes(-10)) { 'just now' } else { (Get-Date) - $configDate | Select-Object -ExpandProperty TotalMinutes | ForEach-Object { "$([math]::Round($_,0)) minutes ago" } }
+            $details = "$details`nConfig: $ageText"
+        }
+        return Format-StatusResult -Name 'Hermes Agent Version' -Status 'Installed' -Message 'Hermes Agent version retrieved from WSL.' -Details $details
     }
 
     return Format-StatusResult -Name 'Hermes Agent Version' -Status 'Error' -Message 'Could not read Hermes Agent version from WSL.' -Details $result.Details -ExitCode $result.ExitCode
@@ -251,7 +259,9 @@ function Get-HermesGatewayStatus {
 
     $status = Invoke-HermesWslCommand -Command 'hermes gateway status 2>&1 || true' -AsAdminUser -TimeoutSeconds 60
     if ($status.Status -eq 'Success' -and $status.Details -match 'Gateway is running|running') {
-        return Format-StatusResult -Name 'Hermes Gateway' -Status 'Running' -Message 'Hermes Gateway status reports running.' -Details $status.Details
+        $reachable = Test-WindowsGatewayReachable
+        $details = if ($reachable) { "Gateway reachable from Windows at localhost:9119" } else { "Gateway running in WSL but not reachable from Windows" }
+        return Format-StatusResult -Name 'Hermes Gateway' -Status 'Running' -Message 'Hermes Gateway is running.' -Details ($status.Details + "`n" + $details)
     }
 
     $process = Invoke-HermesWslCommand -Command "ps -eo pid=,comm=,args= | awk '`$2 !~ /^(bash|sh|awk|ps)$/ && `$0 ~ /gateway/ && `$0 ~ /hermes/ {print}'" -AsAdminUser -TimeoutSeconds 30
@@ -265,6 +275,29 @@ function Get-HermesGatewayStatus {
     }
 
     return Format-StatusResult -Name 'Hermes Gateway' -Status 'Stopped' -Message 'Hermes Gateway is not running.' -Details 'Use Enable Hermes Gateway to run hermes gateway setup/start.'
+}
+
+function Test-WindowsGatewayReachable {
+    try {
+        $request = [System.Net.WebRequest]::Create('http://localhost:9119/health')
+        $request.Method = 'GET'
+        $request.Timeout = 3000
+        $response = $request.GetResponse()
+        $status = [int]$response.StatusCode
+        $response.Close()
+        return ($status -ge 200 -and $status -lt 300)
+    }
+    catch {
+        try {
+            $tcp = New-Object System.Net.Sockets.TcpClient
+            $tcp.Connect('127.0.0.1', 9119)
+            $tcp.Close()
+            return $true
+        }
+        catch {
+            return $false
+        }
+    }
 }
 
 function Enable-HermesGateway {
