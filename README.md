@@ -1,177 +1,107 @@
-﻿# hermes-agent-windows
+# hermes-agent-windows
 
-hermes-agent-windows is a Windows-friendly, PowerShell-only setup tool for Hermes Agent. Windows runs the installer and GUI, but Ollama and Hermes Agent are installed and managed inside WSL.
+Run **Hermes Agent** on Windows without touching a single Linux command. This does all the heavy lifting for you -- one PowerShell command, one WPF GUI, and your entire Hermes + Ollama + WSL environment is ready to go inside WSL.
 
-## What It Does
+## The Short Version
 
-- Checks Administrator access, Windows version, PowerShell version, WSL, WSL distros, WSL accounts, Ollama, Hermes Agent, and Hermes Gateway
-- Installs WSL when missing and clearly warns when Windows needs a reboot
-- Creates or resets a WSL helper account named `admin` with password `admin`
-- Installs and starts Ollama inside WSL, not on the Windows host
-- Saves an optional Ollama Cloud API key in WSL and defaults Hermes to `kimi-k2.6:cloud`
-- Installs Hermes Agent inside WSL with the official Nous Research Linux installer
-- Starts Hermes Gateway in WSL-friendly foreground/background mode
-- Installs or removes Windows Desktop and Start Menu shortcuts for the hermes-agent-windows GUI
-- Provides a WPF GUI with live logs, status cards, and safe rerunnable actions
-- Logs to `logs/install.log` and `logs/app.log`
-
-## Requirements
-
-- Windows 10 or Windows 11
-- Administrator permission for WSL install/repair. The `.bat`, `install.ps1`, and `hermes-agent-windows.ps1` launchers request Admin permission automatically when possible.
-- PowerShell 5.1 or PowerShell 7
-- Internet access
-- WSL 2 recommended
-
-## One-Command Install
+**Paste this in PowerShell (as Admin):**
 
 ```powershell
 irm https://jlaiii.github.io/hermes-agent-windows/install.ps1 | iex
 ```
 
-You can also set `HERMES_AGENT_WINDOWS_BASE_URL` to override the default GitHub URL.
+That is it. It downloads everything, installs WSL if missing, sets up Ollama, installs Hermes Agent, and opens a GUI where you control the whole stack with buttons. No `apt-get`. No `systemctl`. No config files to edit by hand.
 
-## Manual Run
+## What This Does For You
 
+- **Checks your system** -- Windows version, PowerShell version, WSL presence, admin rights. Tells you exactly what is missing.
+- **Installs WSL** when needed. Warns you if Windows needs a reboot.
+- **Creates a WSL helper account** (`admin` / `admin`) so you never have to figure out WSL user setup.
+- **Installs Ollama inside WSL** -- not on your Windows host. Automatically starts it, manages the API key, and lets you pick cloud models.
+- **Installs Hermes Agent inside WSL** using the official Nous Research installer.
+- **Starts Hermes Gateway** and opens the web dashboard at `localhost:9119`.
+- **Gives you a WPF GUI** on Windows with real-time status cards and a live log panel. Start, stop, update, or wipe anything without leaving Windows.
+- **Adds Desktop and Start Menu shortcuts** so you can reopen the GUI anytime.
+- **Safe to re-run** -- every action checks state first. Nothing gets double-installed.
+
+## One-Command Install
+
+Open PowerShell as Administrator and paste:
+
+```powershell
+irm https://jlaiii.github.io/hermes-agent-windows/install.ps1 | iex
+```
+
+If Windows blocks the script, right-click PowerShell and choose **Run as administrator**, then paste again.
+
+You can override the download URL by setting the environment variable `HERMES_AGENT_WINDOWS_BASE_URL` before running the command.
+
+## Manual Options
+
+Already downloaded the ZIP or cloned the repo? No problem.
+
+**PowerShell (any terminal):**
 ```powershell
 powershell.exe -ExecutionPolicy Bypass -File .\hermes-agent-windows.ps1
 ```
 
-If you downloaded the full repo as a ZIP or cloned it with Git, you can also run:
-
+**Double-click (easiest):**
 ```bat
 hermes-agent-windows.bat
 ```
 
-Tip: `hermes-agent-windows.bat`, `install.ps1`, and `hermes-agent-windows.ps1` request Administrator permission automatically. If Windows blocks the prompt, right-click the file and choose **Run as administrator**.
+Both auto-request admin rights and handle execution policy for you.
 
-## GUI Features
+## The GUI At A Glance
 
-- Start full WSL-first setup
-- Install or uninstall the hermes-agent-windows Windows shortcut
-- Check status
-- Install WSL
-- Restart WSL
-- Create/reset the WSL `admin/admin` helper account
-- Install Ollama in WSL
-- Start Ollama
-- Save an Ollama Cloud API key
-- Refresh/search Ollama Cloud models
-- Test Ollama Cloud access with the selected model
-- Install Hermes Agent in WSL
-- Update Hermes Agent
-- Run Hermes Doctor health checks
-- Launch the interactive Hermes Agent CLI/chat in a normal Windows Command Prompt through WSL
-- Enable Hermes Gateway
+The WPF window shows color-coded status cards and lets you:
+
+- Run the full setup with one button
+- Install or uninstall Windows shortcuts
+- Check system status at any time
+- Install, restart, or wipe WSL
+- Create or reset the WSL `admin` helper account
+- Install, start, or stop Ollama
+- Save your Ollama Cloud API key and pick models
+- Install, update, run doctor checks on Hermes Agent
+- Start, stop, or restart Hermes Gateway
 - Open the Hermes web dashboard
-- Start, stop, and restart Hermes Agent
-- Clean Hermes WSL files
-- Reinstall or wipe the default WSL distro with warning confirmations
-- Open config and logs folders
+- Clean Hermes files or reinstall the distro
+- Open config and log folders directly
 
-## Installing The GUI Shortcut
+Everything logs to `logs/install.log` and `logs/app.log`.
 
-After the one-command setup opens the GUI, press **Install hermes-agent-windows Shortcut**. This adds:
+## WSL + Ollama + Hermes -- Handled For You
 
-- Desktop shortcut: `hermes-agent-windows.lnk`
-- Start Menu shortcut: `hermes-agent-windows`
-
-The shortcut launches:
-
-```powershell
-powershell.exe -STA -ExecutionPolicy Bypass -File .\hermes-agent-windows.ps1
-```
-
-Press **Uninstall Shortcut** to remove those shortcuts. This does not delete WSL, Ollama, Hermes Agent, logs, or the project folder.
-
-## WSL Handling
-
-WSL installation uses:
-
-```powershell
-wsl --install
-```
-
-If a reboot is likely required, hermes-agent-windows stops WSL-dependent setup and tells the user to restart Windows.
-
-## Ollama Handling
-
-Ollama is checked and installed inside WSL:
-
-```bash
-curl -fsSL https://ollama.com/install.sh | sh
-```
-
-The GUI starts Ollama with `ollama serve` inside WSL and checks the local WSL API.
-
-## Ollama Cloud API
-
-The GUI has an **Ollama API Key** password field and a searchable model picker. Press:
-
-- **Save Cloud API** to save the key in WSL at `/home/admin/.ollama-cloud.env` and Hermes secrets at `/home/admin/.hermes/.env`
-- **Refresh Models** to download the current Ollama model list from `https://ollama.com/api/tags`
-- **Test Cloud API** to send a small test request to `https://ollama.com/api/chat`
-
-The default model is:
-
-```text
-kimi-k2.6:cloud
-```
-
-The API key is not hardcoded into this project.
-
-## Hermes Agent Handling
-
-Hermes Agent is installed inside WSL:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup
-```
-
-The setup uses the WSL `admin` account and adds the Hermes venv path to commands so non-login WSL checks can find `hermes`.
-
-## Gateway Handling
-
-Hermes Gateway is started with the WSL-recommended mode:
-
-```bash
-nohup hermes gateway run --accept-hooks > ~/.hermes/logs/gateway.log 2>&1 &
-```
-
-Status is checked with:
-
-```bash
-hermes gateway status
-```
-
-The **Open Dashboard** button starts the Hermes web dashboard in WSL and opens:
-
-```text
-http://localhost:9119
-```
-
-## Logs
-
-- Installer log: `logs/install.log`
-- App log: `logs/app.log`
-- WSL Ollama log: `~/.ollama/ollama.log`
-- WSL Hermes Gateway log: `~/.hermes/logs/gateway.log`
+- **WSL install:** Uses `wsl --install`. Reboot required? It tells you instead of crashing.
+- **Ollama install:** Runs `curl -fsSL https://ollama.com/install.sh | sh` inside WSL. Starts with `ollama serve`.
+- **Hermes install:** Runs the official Linux installer inside WSL. Adds venv paths automatically.
+- **Gateway:** Starts in WSL-friendly background mode. `hermes gateway status` checks health.
 
 ## Safety Notes
 
-- Safe to rerun: checks happen before installs.
-- WSL wipe/reinstall buttons require explicit confirmation.
-- Do not run the wipe/reinstall WSL actions unless you have backed up Linux files.
-- The `admin/admin` WSL helper account is convenient for setup. Change or remove it later on shared machines.
+- Safe to rerun -- installs only happen when something is missing.
+- WSL wipe/reinstall buttons ask twice. Back up your Linux files first.
+- The `admin/admin` account is for setup convenience only -- change it on shared machines.
 - Only run scripts from sources you trust.
 
 ## Troubleshooting
 
-- If local scripts are blocked, use the manual run command with `-ExecutionPolicy Bypass`.
-- If WSL install requests a reboot, restart Windows and rerun setup.
-- If Ollama is installed but stopped, press **Start Ollama**.
-- If Hermes shows missing after a long install, press **Check Status**. The installer may have finished but the shell PATH may need refreshing.
-- If Gateway is stopped, press **Enable Gateway** and check `~/.hermes/logs/gateway.log`.
+| Problem | Fix |
+|---|---|
+| Script is blocked by execution policy | Use `-ExecutionPolicy Bypass` or double-click `hermes-agent-windows.bat` |
+| WSL install asks for reboot | Restart Windows, rerun the installer |
+| Ollama installed but stopped | Press **Start Ollama** in the GUI |
+| Hermes shows missing after long install | Press **Check Status** to refresh the PATH detection |
+| Gateway stopped | Press **Enable Gateway** and check `~/.hermes/logs/gateway.log` |
+
+## Requirements
+
+- Windows 10 or Windows 11
+- Administrator rights (auto-requested by `.bat` and installer)
+- PowerShell 5.1 or PowerShell 7
+- Internet connection
+- WSL 2 recommended
 
 ## Author
 
@@ -179,4 +109,3 @@ Built by [Jay (jlaiii)](https://github.com/jlaiii)
 
 - GitHub: [jlaiii](https://github.com/jlaiii)
 - Website: [jlaiii.github.io/hermes-agent-windows](https://jlaiii.github.io/hermes-agent-windows)
-

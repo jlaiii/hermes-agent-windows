@@ -13,6 +13,7 @@
       --bg: #0b0d10;
       --bg-elev: #111318;
       --bg-card: #171a20;
+      --bg-card-hover: #1c1f27;
       --border: #252a32;
       --text: #e2e5eb;
       --text-muted: #8b919d;
@@ -46,26 +47,31 @@
 
     /* hero */
     .hero { padding: 9rem 0 5.5rem; text-align: center; }
-    .hero h1 { font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800; letter-spacing: -1px; line-height: 1.05; margin-bottom: 1.25rem; }
+    .hero h1 { font-size: clamp(2.2rem, 5.5vw, 3.6rem); font-weight: 800; letter-spacing: -1px; line-height: 1.05; margin-bottom: 1.1rem; }
     .hero h1 span { color: var(--accent); }
-    .hero p { font-size: 1.15rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 2.5rem; }
+    .hero .tagline { font-size: 1.25rem; color: var(--text-muted); max-width: 620px; margin: 0 auto 2.75rem; }
+    .hero .tagline strong { color: var(--text); font-weight: 600; }
 
-    .install-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; max-width: 680px; margin: 0 auto 1.5rem; text-align: left; overflow-x: auto; }
+    .install-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; max-width: 700px; margin: 0 auto 1rem; text-align: left; overflow-x: auto; }
     .install-box code {
       font-family: 'JetBrains Mono', monospace; font-size: 0.93rem; color: var(--text);
       display: block; white-space: nowrap;
     }
     .install-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 0.5rem; }
-    .btn-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+    .btn-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.25rem; }
     .btn {
       display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.7rem 1.5rem; border-radius: 8px; font-size: 0.92rem; font-weight: 600;
+      padding: 0.75rem 1.65rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600;
       border: 1px solid var(--border); background: var(--bg-card); color: var(--text);
       cursor: pointer; transition: all 0.15s ease;
     }
     .btn:hover { border-color: var(--accent); background: var(--accent-glow); }
     .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
     .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); box-shadow: 0 0 24px var(--accent-glow); }
+
+    .hero-note {
+      font-size: 0.8rem; color: var(--text-muted); margin-top: 1.25rem;
+    }
 
     /* section defaults */
     section { padding: 5rem 0; }
@@ -74,17 +80,17 @@
       margin-bottom: 0.5rem; text-align: center;
     }
     .section-sub {
-      color: var(--text-muted); text-align: center; max-width: 520px;
-      margin: 0 auto 3rem; font-size: 1rem;
+      color: var(--text-muted); text-align: center; max-width: 540px;
+      margin: 0 auto 3rem; font-size: 1.05rem;
     }
 
-    /* features */
+    /* feature grid */
     .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
     .feature-card {
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 1.75rem; transition: border-color 0.15s ease, transform 0.15s ease;
+      padding: 1.75rem; transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
     }
-    .feature-card:hover { border-color: #344050; transform: translateY(-2px); }
+    .feature-card:hover { border-color: #344050; transform: translateY(-2px); background: var(--bg-card-hover); }
     .feature-card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.6rem; }
     .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.55; }
     .feature-icon {
@@ -93,13 +99,35 @@
       background: var(--accent-glow); color: var(--accent);
     }
 
-    /* how it works */
+    /* skip list */
+    .skip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+    .skip-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1rem 1.2rem;
+      font-size: 0.9rem; color: var(--text-muted);
+    }
+    .skip-check {
+      flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(62,207,122,0.15); display: flex;
+      align-items: center; justify-content: center;
+    }
+    .skip-check::after {
+      content: ""; width: 6px; height: 10px;
+      border: solid var(--good); border-width: 0 2px 2px 0;
+      transform: rotate(45deg); margin-bottom: 2px;
+    }
+    .skip-item span { color: var(--text); font-weight: 500; }
+
+    /* steps */
     .steps { max-width: 720px; margin: 0 auto; }
     .step {
-      display: flex; gap: 1.25rem; align-items: flex-start; padding: 1.5rem 2rem;
+      display: flex; gap: 1.25rem; align-items: flex-start;
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      margin-bottom: 1rem;
+      padding: 1.5rem 2rem; margin-bottom: 1rem;
+      transition: border-color 0.15s ease, transform 0.15s ease;
     }
+    .step:hover { transform: translateY(-1px); border-color: #344050; }
     .step-num {
       flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
       background: var(--accent); color: #fff; font-weight: 700; font-size: 0.9rem;
@@ -133,6 +161,7 @@
 
     @media (max-width: 640px) {
       .nav-links { display: none; }
+      .hero { padding: 7.5rem 0 4rem; }
     }
   </style>
 </head>
@@ -144,6 +173,7 @@
       <div class="nav-brand">Hermes<span>Agent for Windows</span></div>
       <div class="nav-links">
         <a href="#features">Features</a>
+        <a href="#skip">What You Skip</a>
         <a href="#how">How It Works</a>
         <a href="#install">Install</a>
         <a href="https://github.com/jlaiii/hermes-agent-windows" target="_blank">GitHub</a>
@@ -154,8 +184,10 @@
 
 <section class="hero">
   <div class="container">
-    <h1>Hermes Agent, <span>zero friction</span> on Windows.</h1>
-    <p>One PowerShell command, one WPF GUI, and your entire Hermes + Ollama + WSL environment is ready to go inside WSL. No manual config needed.</p>
+    <h1>Run Hermes Agent on Windows.<br><span>We do all the heavy lifting.</span></h1>
+    <p class="tagline">
+      One PowerShell command. One WPF GUI. Your entire <strong>Hermes + Ollama + WSL</strong> environment is ready to go inside WSL without you touching a single Linux command.
+    </p>
 
     <div class="install-box" id="installBox">
       <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -172,52 +204,76 @@
         Download ZIP
       </a>
     </div>
+
+    <p class="hero-note">Windows 10/11 + Admin rights + Internet. WSL auto-installed if missing.</p>
   </div>
 </section>
 
 <section id="features" style="background: var(--bg-elev);">
   <div class="container">
-    <h2 class="section-title">Everything in one place.</h2>
+    <h2 class="section-title">What it handles for you.</h2>
     <p class="section-sub">Checks, installs, starts, monitors, and updates every part of the Hermes stack from a single Windows GUI.</p>
 
     <div class="feature-grid">
       <div class="feature-card">
-        <h3><span class="feature-icon">></span> One-command setup</h3>
-        <p>Paste the installer, it auto-elevates, downloads files, launches the GUI. No manual WSL or Linux commands.</p>
+        <h3><span class="feature-icon">+</span> One-command setup</h3>
+        <p>Paste the installer. It auto-elevates, downloads files, launches the GUI. No manual WSL or Linux commands.</p>
       </div>
       <div class="feature-card">
-        <h3><span class="feature-icon">></span> WPF GUI with live logs</h3>
+        <h3><span class="feature-icon">+</span> WPF GUI with live logs</h3>
         <p>Status cards for WSL, Ollama, Hermes, and Gateway. Watch the live log panel while setup runs in the background.</p>
       </div>
       <div class="feature-card">
-        <h3><span class="feature-icon">></span> WSL managed for you</h3>
+        <h3><span class="feature-icon">+</span> WSL managed for you</h3>
         <p>Installs WSL if missing, warns for reboots, starts or restarts the distro, and creates an <code class="inline">admin</code> helper account.</p>
       </div>
       <div class="feature-card">
-        <h3><span class="feature-icon">></span> Ollama in WSL</h3>
+        <h3><span class="feature-icon">+</span> Ollama in WSL</h3>
         <p>Ollama is installed and served inside WSL, not on the Windows host. API key and cloud model picker built in.</p>
       </div>
       <div class="feature-card">
-        <h3><span class="feature-icon">></span> Hermes Agent lifecycle</h3>
+        <h3><span class="feature-icon">+</span> Hermes Agent lifecycle</h3>
         <p>Install, update, start, stop, restart, doctor, and clean Hermes Agent without leaving Windows.</p>
       </div>
       <div class="feature-card">
-        <h3><span class="feature-icon">></span> Gateway + Dashboard</h3>
+        <h3><span class="feature-icon">+</span> Gateway + Dashboard</h3>
         <p>Start the Hermes gateway from the GUI, then open the web dashboard at <code class="inline">localhost:9119</code> with one click.</p>
       </div>
       <div class="feature-card">
-        <h3><span class="feature-icon">></span> Safe reruns</h3>
+        <h3><span class="feature-icon">+</span> Safe to re-run</h3>
         <p>Every action checks state first before modifying anything. Wipe and reinstall buttons require explicit confirmation.</p>
       </div>
       <div class="feature-card">
-        <h3><span class="feature-icon">></span> Windows shortcuts</h3>
+        <h3><span class="feature-icon">+</span> Windows shortcuts</h3>
         <p>Install or remove Desktop and Start Menu shortcuts directly from the GUI. Clean, no registry hacks.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section id="how">
+<section id="skip">
+  <div class="container">
+    <h2 class="section-title">What you do not have to do.</h2>
+    <p class="section-sub">All the Linux and WSL chores you skip by using this tool.</p>
+
+    <div class="skip-grid">
+      <div class="skip-item"><div class="skip-check"></div>No manual <span>WSL installation</span></div>
+      <div class="skip-item"><div class="skip-check"></div>No <span>apt-get</span> or package management</div>
+      <div class="skip-item"><div class="skip-check"></div>No configuring <span>Linux user accounts</span></div>
+      <div class="skip-item"><div class="skip-check"></div>No <span>systemctl</span> or service management</div>
+      <div class="skip-item"><div class="skip-check"></div>No editing <span>config files by hand</span></div>
+      <div class="skip-item"><div class="skip-check"></div>No <span>PATH variable</span> wrestling</div>
+      <div class="skip-item"><div class="skip-check"></div>No <span>env files</span> or secrets setup</div>
+      <div class="skip-item"><div class="skip-check"></div>No <span>terminal multiplexers</span> or screen/tmux</div>
+      <div class="skip-item"><div class="skip-check"></div>No <span>firewall rules</span> for WSL ports</div>
+      <div class="skip-item"><div class="skip-check"></div>No guessing if <span>services are running</span></div>
+      <div class="skip-item"><div class="skip-check"></div>No <span>docker</span> or container setup</div>
+      <div class="skip-item"><div class="skip-check"></div>No deep <span>PowerShell scripting</span> knowledge</div>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="background: var(--bg-elev);">
   <div class="container">
     <h2 class="section-title">How it works.</h2>
     <p class="section-sub">Four steps from nothing to a running Hermes Agent inside WSL.</p>
@@ -227,7 +283,7 @@
         <div class="step-num">1</div>
         <div>
           <h4>Paste the one-liner</h4>
-          <p>Open PowerShell, paste the installer, press Enter. It requests Admin rights, downloads the project, and launches the GUI.</p>
+          <p>Open PowerShell, paste the installer, press Enter. It requests Admin rights, downloads the project, and launches the GUI. No setup needed.</p>
         </div>
       </div>
       <div class="step">
@@ -241,21 +297,21 @@
         <div class="step-num">3</div>
         <div>
           <h4>Run full setup</h4>
-          <p>Click Start Hermes Agent Setup. It installs WSL, creates the admin account, installs Ollama, installs Hermes, and starts the gateway.</p>
+          <p>Click Start Hermes Agent Setup. It installs WSL, creates the admin account, installs Ollama, installs Hermes, and starts the gateway. All while you watch the live log panel.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <div>
           <h4>Use it</h4>
-          <p>Launch the Hermes CLI in a Windows terminal through WSL, open the web dashboard, or manage everything from the GUI.</p>
+          <p>Launch the Hermes CLI in a Windows terminal through WSL, open the web dashboard, or manage everything from the GUI. Done.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section style="background: var(--bg-elev);">
+<section>
   <div class="container">
     <h2 class="section-title">Real-time status cards.</h2>
     <p class="section-sub">See exactly what is running and what needs attention at a glance.</p>
@@ -297,7 +353,7 @@
   </div>
 </section>
 
-<section id="install">
+<section id="install" style="background: var(--bg-elev);">
   <div class="container">
     <h2 class="section-title">Install.</h2>
     <p class="section-sub">Pick the method that fits you best. All end up in the same GUI.</p>
@@ -313,10 +369,10 @@
   </div>
 </section>
 
-  <footer>
+<footer>
   <div class="container">
     <p>Built by <a href="https://github.com/jlaiii" target="_blank">Jay (jlaiii)</a> — <a href="https://github.com/jlaiii/hermes-agent-windows" target="_blank">github.com/jlaiii/hermes-agent-windows</a></p>
-    <p style="margin-top: 0.25rem; opacity: 0.7;">Open source under the project license. Not affiliated with Nous Research.</p>
+    <p style="margin-top: 0.25rem; opacity: 0.7;">Open source. Not affiliated with Nous Research.</p>
   </div>
 </footer>
 
