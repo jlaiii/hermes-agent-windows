@@ -358,3 +358,126 @@ function Open-HermesConfigFolder {
     return Open-FolderSafe -Path (Join-Path (Get-ProjectRoot) 'config')
 }
 
+function Get-HermesReleaseCachePath {
+    return Join-Path (Get-ProjectRoot) 'version-cache.json'
+}
+
+function Get-LatestHermesReleaseVersion {
+    $cacheFile = Get-HermesReleaseCachePath
+    $maxAge = [TimeSpan]::FromMinutes(15)
+
+    if (Test-Path $cacheFile) {
+        try {
+            $cached = Get-Content -Path $cacheFile -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+            $cachedAt = [DateTime]$cached.CheckedAt
+            if ((Get-Date) - $cachedAt -lt $maxAge) {
+                return [pscustomobject]@{
+                    Status   = 'Installed'
+                    Message  = "Cached latest: $($cached.LatestVersion)"
+                    Details  = "Checked at $($cached.CheckedAt)"
+                    ExitCode = 0
+                    Version  = $cached.LatestVersion
+                }
+            }
+        }
+        catch {
+        }
+    }
+
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/NousResearch/hermes-agent/releases/latest' -TimeoutSec 30 -ErrorAction Stop
+        $tag = $release.tag_name -replace '^v', ''
+
+        $cacheEntry = @{
+            LatestVersion = $tag
+            CheckedAt     = (Get-Date).ToString('o')
+        } | ConvertTo-Json -Depth 3
+
+        try {
+            [System.IO.File]::WriteAllText($cacheFile, $cacheEntry, (New-Object System.Text.UTF8Encoding($false)))
+        }
+        catch {
+        }
+
+        return [pscustomobject]@{
+            Status   = 'Installed'
+            Message  = "Latest release: v$tag"
+            Details  = 'Fetched from GitHub API.'
+            ExitCode = 0
+            Version  = $tag
+        }
+    }
+    catch {
+        return [pscustomobject]@{
+            Status   = 'Error'
+            Message  = 'Could not check GitHub for latest Hermes release.'
+            Details  = $_.Exception.Message
+            ExitCode = 1
+            Version  = ''
+        }
+    }
+}
+
+function Get-HermesUpdateStatus {
+    $installed = Get-HermesVersion
+    $latest = Get-LatestHermesReleaseVersion
+
+    if ($installed.Status -ne 'Installed') {
+        return Format-StatusResult -Name 'Hermes Update' -Status 'Missing' -Message 'Hermes Agent is not installed in WSL.' -Details 'Install Hermes Agent before checking for updates.'
+    }
+
+    $versionText = ''
+    if ($installed.Details -match '(?:version[v]?[\s:]?)?(\d+\.\d+(?:\.\d+)?)') {
+        $versionText = $Matches[1]
+    }
+
+    if (-not $versionText -and $installed.Message -match '(\d+\.\d+(?:\.\d+)?)') {
+        $versionText = $Matches[1]
+    }
+
+    if (-not $versionText) {
+        $versionText = '0.0.0'
+    }
+
+    if ($latest.Status -ne 'Installed') {
+        return Format-StatusResult -Name 'Hermes Update' -Status 'Unknown' -Message 'Hermes Agent installed, but could not reach GitHub.' -Details "$($installed.Message)`n$($latest.Message)"
+    }
+
+    try {
+        $currentObj = [version]$versionText
+        $latestObj = [version]$latest.Version
+
+        if ($latestObj -gt $currentObj) {
+            return Format-StatusResult -Name 'Hermes Update' -Status 'Needs Update' -Message "Update available: v$($latest.Version) (installed: v$versionText)" -Details "A newer release is on GitHub. Click Update Hermes Agent to upgrade."
+        }
+
+        return Format-StatusResult -Name 'Hermes Update' -Status 'Installed' -Message "Hermes is up to date (v$versionText)" -Details "Latest: v$($latest.Version)"
+    }
+    catch {
+        return Format-StatusResult -Name 'Hermes Update' -Status 'Unknown' -Message "Hermes installed version: v$versionText | latest: v$($latest.Version)" -Details "Version comparison failed. Check manually if needed."
+    }
+}
+
+function Get-HermesAgentWindowsUpdateInfo {
+    $cacheFile = Join-Path (Get-ProjectRoot) 'version-cache.json'
+    if (Test-Path $cacheFile) {
+        try {
+            $cached = Get-Content -Path $cacheFile -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+            if ($cached.LatestVersion -and $cached.CheckedAt) {
+                $checkedAt = [DateTime]$cached.CheckedAt
+                $age = (Get-Date) - $checkedAt
+                $ageText = if ($age.TotalMinutes -lt 1) { 'just now' } elseif ($age.TotalMinutes -lt 60) { "$([math]::Round($age.TotalMinutes))m ago" } else { "$([math]::Round($age.TotalHours,1))h ago" }
+                return [pscustomobject]@{
+                    LatestVersion = $cached.LatestVersion
+                    CheckedAt     = $cached.CheckedAt
+                    AgeText       = $ageText
+                }
+            }
+        }
+        catch {
+        }
+    }
+    return $null
+}
+

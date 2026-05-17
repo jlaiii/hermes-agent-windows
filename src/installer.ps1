@@ -32,10 +32,9 @@ function Invoke-StatusCheck {
     $hermesVersion = Get-HermesVersion
     $gatewayStatus = Get-HermesGatewayStatus
     $appStatus = Get-hermes-agent-windowsAppStatus
+    $updateCheck = Get-HermesUpdateStatus
 
     $ollamaStatus = Format-StatusResult -Name 'Ollama Status' -Status $(if ($ollamaAvailable) { $ollamaRunning.Status } else { 'Missing' }) -Message $(if ($ollamaAvailable) { 'Ollama is installed inside WSL.' } else { 'Ollama is missing inside WSL.' }) -Details $(if ($ollamaAvailable) { $ollamaRunning.Details } else { 'Use Install Ollama in WSL.' })
-    $updateStatus = if ($hermesVersion.Status -eq 'Installed' -and $ollamaVersion.Status -eq 'Installed') { 'Installed' } else { 'Unknown' }
-    $updateMessage = if ($updateStatus -eq 'Installed') { 'Core WSL components are installed. Use Update All to refresh WSL and Hermes.' } else { 'Install missing WSL components before checking updates.' }
 
     $statusLines = @(
         "Admin Check: $($summary.Admin)"
@@ -51,7 +50,7 @@ function Invoke-StatusCheck {
         "Hermes Version: $($hermesVersion.Status) - $($hermesVersion.Message)"
         "Hermes Gateway: $($gatewayStatus.Status) - $($gatewayStatus.Message)"
         "hermes-agent-windows App: $($appStatus.Status) - $($appStatus.Message)"
-        "Update Status: $updateStatus - $updateMessage"
+        "Update Status: $($updateCheck.Status) - $($updateCheck.Message)"
     )
 
     foreach ($line in $statusLines) {
@@ -73,8 +72,8 @@ function Invoke-StatusCheck {
         HermesVersion    = [pscustomobject]$hermesVersion
         GatewayStatus    = [pscustomobject]$gatewayStatus
         AppStatus        = [pscustomobject]$appStatus
-        Updates          = Format-StatusResult -Name 'Updates' -Status $updateStatus -Message $updateMessage
-        Summary          = "App: $($appStatus.Status) | WSL: $($wslDistros.Status) | Account: $($wslAccount.Status) | Ollama: $($ollamaStatus.Status) | Hermes: $($hermesStatus.Status) | Gateway: $($gatewayStatus.Status)"
+        Updates          = [pscustomobject]$updateCheck
+        Summary          = "App: $($appStatus.Status) | WSL: $($wslDistros.Status) | Account: $($wslAccount.Status) | Ollama: $($ollamaStatus.Status) | Hermes: $($hermesStatus.Status) | Gateway: $($gatewayStatus.Status) | Updates: $($updateCheck.Status)"
     }
 }
 

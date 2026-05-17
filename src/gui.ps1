@@ -874,7 +874,34 @@ function Start-hermes-agent-windowsGui {
     })
 
     Add-GuiLogLine 'hermes-agent-windows GUI started.'
+
+    # Pre-fill model dropdown from cache so it's never empty on launch
+    try {
+        $cachedModels = Import-OllamaCloudModels
+        if ($cachedModels.Models) {
+            $controls.OllamaModelBox.Items.Clear()
+            foreach ($modelName in @($cachedModels.Models)) {
+                [void]$controls.OllamaModelBox.Items.Add($modelName)
+            }
+            if (-not $controls.OllamaModelBox.Text) {
+                $controls.OllamaModelBox.Text = 'kimi-k2.6:cloud'
+            }
+            Add-GuiLogLine "Loaded $($cachedModels.Models.Count) cached models."
+        }
+    }
+    catch {
+    }
+
     Start-StatusCheckJob
+    Start-RefreshOllamaModelsJob
+
+    # Make the Updates card clickable when an update is detected
+    $controls.UpdatesStatusBorder.Cursor = 'Hand'
+    $controls.UpdatesStatusBorder.Add_MouseLeftButtonDown({
+        Start-UpdateHermesJob
+    })
+    $controls.UpdatesStatusBorder.ToolTip = 'Click to update Hermes Agent.'
+
     $window.Add_Closed({
         $timer.Stop()
         foreach ($entry in @($script:GuiState.Jobs.GetEnumerator())) {

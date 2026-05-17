@@ -17,3 +17,8 @@ node_modules/
 # Build artifacts
 dist/
 build/
+
+# Runtime caches
+models.json
+version-cache.json
+

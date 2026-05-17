@@ -213,6 +213,18 @@ function Get-OllamaCloudModels {
             $models = @('kimi-k2.6:cloud') + $models
         }
 
+        $modelsJson = @{
+            Timestamp = (Get-Date).ToString('o')
+            Models    = $models
+        } | ConvertTo-Json -Depth 3
+
+        $cacheFile = Join-Path (Get-ProjectRoot) 'models.json'
+        try {
+            [System.IO.File]::WriteAllText($cacheFile, $modelsJson, (New-Object System.Text.UTF8Encoding($false)))
+        }
+        catch {
+        }
+
         return [pscustomobject]@{
             Status = 'Installed'
             Message = 'Ollama cloud model list downloaded.'
@@ -229,6 +241,45 @@ function Get-OllamaCloudModels {
             ExitCode = 1
             Models = @('kimi-k2.6:cloud')
         }
+    }
+}
+
+function Import-OllamaCloudModels {
+    $cacheFile = Join-Path (Get-ProjectRoot) 'models.json'
+    if (Test-Path $cacheFile) {
+        try {
+            $cached = Get-Content -Path $cacheFile -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+            if ($cached.Models) {
+                return [pscustomobject]@{
+                    Status   = 'Installed'
+                    Message  = "Loaded $($cached.Models.Count) cached models."
+                    Details  = "Cached at $($cached.Timestamp)"
+                    ExitCode = 0
+                    Models   = @($cached.Models)
+                }
+            }
+        }
+        catch {
+        }
+    }
+
+    return [pscustomobject]@{
+        Status   = 'Missing'
+        Message  = 'No cached model list found.'
+        Details  = 'Click Refresh Models to download.'
+        ExitCode = 0
+        Models   = @(
+            'kimi-k2.6:cloud',
+            'qwen3:cloud',
+            'qwq:cloud',
+            'gemma3:cloud',
+            'mistral-small:cloud',
+            'llama3.3:cloud',
+            'qwen2.5:cloud',
+            'deepseek-r1:cloud',
+            'phi4:cloud',
+            'granite3.2:cloud'
+        )
     }
 }
 
