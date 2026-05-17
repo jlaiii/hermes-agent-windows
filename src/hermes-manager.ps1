@@ -107,10 +107,50 @@ function Update-HermesAgent {
         return Install-HermesAgent
     }
 
-    # hermes CLI may not have a built-in update command; run the official installer script again
-    $result = Invoke-HermesWslCommand -Command 'curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup' -AsAdminUser -TimeoutSeconds 900
+    # Fast path: update in-place via git pull (avoids installer TTY prompts that deadlock in background jobs).
+    # The installer always clones into ~/.hermes/hermes-agent, so a git repo should exist.
+    $fastUpdate = @'
+set -e
+if [ -d "$HOME/.hermes/hermes-agent/.git" ]; then
+    cd "$HOME/.hermes/hermes-agent"
+    echo "Updating Hermes Agent from git..."
+    git fetch origin
+    current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+    git reset --hard "origin/${current_branch}" 2>/dev/null || git reset --hard origin/main
+    echo "Installing updated package..."
+    if command -v uv &>/dev/null; then
+        uv pip install -e . 2>&1
+    else
+        python3 -m pip install -e . 2>&1
+    fi
+    echo "In-place update complete."
+else
+    echo "No git repository found; falling back to installer script."
+    exit 1
+fi
+'@
+    $result = Invoke-HermesWslCommand -Command $fastUpdate -AsAdminUser -TimeoutSeconds 300
+
+    # Fallback: download installer script to a temp file first, then run with stdin closed
+    # so any /dev/tty reads in the installer get EOF immediately instead of hanging.
+    if ($result.Status -ne 'Success') {
+        $logFile = Get-LogFilePath -Kind 'app'
+        Write-Log -Message 'Fast in-place update failed or not available. Falling back to installer script.' -Level 'WARN' -LogFile $logFile | Out-Null
+        $installerPath = '/tmp/hermes-agent-update.sh'
+        $installerCmd = @"
+set -e
+cd /tmp
+curl -fSL -o '$installerPath' 'https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh'
+# Run the installer script with --skip-setup, but give it an empty stdin so any
+# prompt that falls back to reading stdin gets EOF instead of hanging forever.
+bash '$installerPath' --skip-setup </dev/null 2>&1
+rm -f '$installerPath'
+"@
+        $result = Invoke-HermesWslCommand -Command $installerCmd -AsAdminUser -TimeoutSeconds 900
+    }
+
     if ($result.Status -eq 'Success' -and (Test-HermesInstalled)) {
-        return Format-StatusResult -Name 'Hermes Update' -Status 'Installed' -Message 'Hermes Agent was updated in WSL via the official installer.' -Details $result.Details
+        return Format-StatusResult -Name 'Hermes Update' -Status 'Installed' -Message 'Hermes Agent was updated in WSL.' -Details $result.Details
     }
 
     if ($result.Status -eq 'Success') {
