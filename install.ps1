@@ -197,9 +197,11 @@ try {
             if ($hasPlaceholderBaseUrl) {
                 Stop-Installer -Message "Missing file: $relativePath. The base URL is a placeholder. Provide the full local project files." -ExitCode 1
             }
-
-            Download-ProjectFile -BaseUrl $baseUrl -RelativePath $relativePath -TargetPath $target
         }
+        else {
+            Write-InstallStatus -Message "Refreshing $relativePath" -Level 'INFO'
+        }
+        Download-ProjectFile -BaseUrl $baseUrl -RelativePath $relativePath -TargetPath $target
     }
 
     $requiredScripts = @(
