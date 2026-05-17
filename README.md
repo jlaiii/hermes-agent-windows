@@ -1,162 +1,182 @@
-# Hermes Agent for Windows
+﻿# hermes-agent-windows
 
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-blue)](https://jlaiii.github.io/hermes-agent-windows/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-**One-click Windows installer for [Hermes Agent](https://hermes-agent.nousresearch.com/) by Nous Research.**
-
-Hermes Agent officially supports Linux, macOS, and WSL2 — not native Windows. This project **bridges that gap** for Windows users by automating the entire WSL2-based setup from end to end. You run one script and everything happens automatically.
-
-**Live Site:** https://jlaiii.github.io/hermes-agent-windows/
-
-**GitHub Repo:** https://github.com/jlaiii/hermes-agent-windows
-
----
-
-## Who Is This For?
-
-- **Windows users** who want to run Hermes Agent but don't want to manually set up WSL, Ubuntu, Ollama, and Linux dependencies
-- **Non-technical users** who just want to click a `.bat` file or run a one-liner and have it work
-- **Anyone** who wants Windows-native shortcuts and launchers for a Linux-only AI agent
-
-Hermes Agent is not natively available for Windows. Normally you would have to:
-1. Manually enable WSL2 in Windows
-2. Install Ubuntu-22.04 from the Microsoft Store
-3. Install Ollama inside Ubuntu
-4. Install Hermes Agent inside Ubuntu
-5. Figure out how to launch everything from Windows
-
-**This installer does all of that for you.** It handles the reboot, resumes automatically, and gives you proper Windows desktop shortcuts and `.bat` launchers so you never need to type a WSL command manually.
-
----
+hermes-agent-windows is a Windows-friendly, PowerShell-only setup tool for Hermes Agent. Windows runs the installer and GUI, but Ollama and Hermes Agent are installed and managed inside WSL.
 
 ## What It Does
 
-- **Installs WSL2** — Enables Windows Subsystem for Linux with a single command.
-- **Installs Ubuntu-22.04** — Sets up the LTS environment required by Hermes Agent.
-- **Installs Ollama** — Pulls and configures the local LLM runtime.
-- **Installs Hermes Agent** — Deploys the latest Hermes Agent release inside WSL.
-- **Creates .bat Launchers** — One-click Windows batch files for every major component.
-- **Creates Desktop Shortcuts** — Icons placed directly on your desktop for easy access.
+- Checks Administrator access, Windows version, PowerShell version, WSL, WSL distros, WSL accounts, Ollama, Hermes Agent, and Hermes Gateway
+- Installs WSL when missing and clearly warns when Windows needs a reboot
+- Creates or resets a WSL helper account named `admin` with password `admin`
+- Installs and starts Ollama inside WSL, not on the Windows host
+- Saves an optional Ollama Cloud API key in WSL and defaults Hermes to `kimi-k2.6:cloud`
+- Installs Hermes Agent inside WSL with the official Nous Research Linux installer
+- Starts Hermes Gateway in WSL-friendly foreground/background mode
+- Installs or removes Windows Desktop and Start Menu shortcuts for the hermes-agent-windows GUI
+- Provides a WPF GUI with live logs, status cards, and safe rerunnable actions
+- Logs to `logs/install.log` and `logs/app.log`
 
----
+## Requirements
 
-## Prerequisites
+- Windows 10 or Windows 11
+- Administrator permission for WSL install/repair. The `.bat`, `install.ps1`, and `hermes-agent-windows.ps1` launchers request Admin permission automatically when possible.
+- PowerShell 5.1 or PowerShell 7
+- Internet access
+- WSL 2 recommended
 
-- **Windows 10 version 20H2 or later**, or **Windows 11**
-- **Administrator rights** (the PowerShell script requires elevation)
-- **Internet connection** (downloads WSL, Ubuntu, Ollama, and Hermes Agent)
-
----
-
-## Installation
-
-Open **PowerShell as Administrator** and run:
+## One-Command Install
 
 ```powershell
-irm https://raw.githubusercontent.com/jlaiii/hermes-agent-windows/main/Install-Hermes-Windows.ps1 | iex
+irm https://jlaiii.github.io/hermes-agent-windows/install.ps1 | iex
 ```
 
-Or download `Install-Hermes-Windows.ps1` manually and execute it with right-click → **Run with PowerShell**.
+You can also set `HERMES_AGENT_WINDOWS_BASE_URL` to override the default GitHub URL.
 
----
+## Manual Run
 
-## How It Works
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File .\hermes-agent-windows.ps1
+```
 
-1. **Check Environment** — Verifies Windows version and admin privileges.
-2. **Enable WSL2** — Installs the Windows Subsystem for Linux 2 kernel and sets it as default.
-3. **Install Ubuntu-22.04** — Downloads and registers the Ubuntu 22.04 LTS distro from the Microsoft Store.
-4. **Install Ollama** — Runs the official Ollama installer inside Ubuntu.
-5. **Install Hermes Agent** — Pulls the latest Hermes Agent package and installs it within the WSL environment.
-6. **Create Launchers** — Generates `.bat` files in `%USERPROFILE%\hermes-agent-windows\`.
-7. **Create Shortcuts** — Places Windows desktop shortcuts pointing to each launcher.
+If you downloaded the full repo as a ZIP or cloned it with Git, you can also run:
 
----
+```bat
+hermes-agent-windows.bat
+```
 
-## Launchers
+Tip: `hermes-agent-windows.bat`, `install.ps1`, and `hermes-agent-windows.ps1` request Administrator permission automatically. If Windows blocks the prompt, right-click the file and choose **Run as administrator**.
 
-After installation you will find the following `.bat` files and desktop shortcuts:
+## GUI Features
 
-| Launcher | Purpose |
-|----------|---------|
-| **Hermes CLI** | Start an interactive Hermes Agent terminal session |
-| **Gateway** | Launch the Hermes Agent web gateway |
-| **ACP Server** | Start the Agent-Computer Protocol server |
-| **Ollama Server** | Start the Ollama LLM backend server |
-| **Setup** | Re-run initial setup / repair the installation |
+- Start full WSL-first setup
+- Install or uninstall the hermes-agent-windows Windows shortcut
+- Check status
+- Install WSL
+- Restart WSL
+- Create/reset the WSL `admin/admin` helper account
+- Install Ollama in WSL
+- Start Ollama
+- Save an Ollama Cloud API key
+- Refresh/search Ollama Cloud models
+- Test Ollama Cloud access with the selected model
+- Install Hermes Agent in WSL
+- Update Hermes Agent
+- Run Hermes Doctor health checks
+- Launch the interactive Hermes Agent CLI/chat in a normal Windows Command Prompt through WSL
+- Enable Hermes Gateway
+- Open the Hermes web dashboard
+- Start, stop, and restart Hermes Agent
+- Clean Hermes WSL files
+- Reinstall or wipe the default WSL distro with warning confirmations
+- Open config and logs folders
 
-All launchers are stored in `%USERPROFILE%\hermes-agent-windows\` and are also available as desktop shortcuts.
+## Installing The GUI Shortcut
 
----
+After the one-command setup opens the GUI, press **Install hermes-agent-windows Shortcut**. This adds:
 
-## System Requirements
+- Desktop shortcut: `hermes-agent-windows.lnk`
+- Start Menu shortcut: `hermes-agent-windows`
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| OS | Windows 10 20H2 | Windows 11 latest |
-| RAM | 8 GB | 16 GB or more |
-| Disk | 20 GB free | 50 GB free |
-| CPU | 64-bit, virtualization enabled | Modern multi-core |
-| Network | Broadband | Broadband |
+The shortcut launches:
 
-> **Note:** Virtualization (Hyper-V / VT-x) must be enabled in BIOS for WSL2.
+```powershell
+powershell.exe -STA -ExecutionPolicy Bypass -File .\hermes-agent-windows.ps1
+```
 
----
+Press **Uninstall Shortcut** to remove those shortcuts. This does not delete WSL, Ollama, Hermes Agent, logs, or the project folder.
+
+## WSL Handling
+
+WSL installation uses:
+
+```powershell
+wsl --install
+```
+
+If a reboot is likely required, hermes-agent-windows stops WSL-dependent setup and tells the user to restart Windows.
+
+## Ollama Handling
+
+Ollama is checked and installed inside WSL:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+The GUI starts Ollama with `ollama serve` inside WSL and checks the local WSL API.
+
+## Ollama Cloud API
+
+The GUI has an **Ollama API Key** password field and a searchable model picker. Press:
+
+- **Save Cloud API** to save the key in WSL at `/home/admin/.ollama-cloud.env` and Hermes secrets at `/home/admin/.hermes/.env`
+- **Refresh Models** to download the current Ollama model list from `https://ollama.com/api/tags`
+- **Test Cloud API** to send a small test request to `https://ollama.com/api/chat`
+
+The default model is:
+
+```text
+kimi-k2.6:cloud
+```
+
+The API key is not hardcoded into this project.
+
+## Hermes Agent Handling
+
+Hermes Agent is installed inside WSL:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup
+```
+
+The setup uses the WSL `admin` account and adds the Hermes venv path to commands so non-login WSL checks can find `hermes`.
+
+## Gateway Handling
+
+Hermes Gateway is started with the WSL-recommended mode:
+
+```bash
+nohup hermes gateway run --accept-hooks > ~/.hermes/logs/gateway.log 2>&1 &
+```
+
+Status is checked with:
+
+```bash
+hermes gateway status
+```
+
+The **Open Dashboard** button starts the Hermes web dashboard in WSL and opens:
+
+```text
+http://localhost:9119
+```
+
+## Logs
+
+- Installer log: `logs/install.log`
+- App log: `logs/app.log`
+- WSL Ollama log: `~/.ollama/ollama.log`
+- WSL Hermes Gateway log: `~/.hermes/logs/gateway.log`
+
+## Safety Notes
+
+- Safe to rerun: checks happen before installs.
+- WSL wipe/reinstall buttons require explicit confirmation.
+- Do not run the wipe/reinstall WSL actions unless you have backed up Linux files.
+- The `admin/admin` WSL helper account is convenient for setup. Change or remove it later on shared machines.
+- Only run scripts from sources you trust.
 
 ## Troubleshooting
 
-### WSL Restart Required
-If you see a message asking to restart after WSL installation, **reboot your computer** and re-run the installer. It will resume where it left off.
+- If local scripts are blocked, use the manual run command with `-ExecutionPolicy Bypass`.
+- If WSL install requests a reboot, restart Windows and rerun setup.
+- If Ollama is installed but stopped, press **Start Ollama**.
+- If Hermes shows missing after a long install, press **Check Status**. The installer may have finished but the shell PATH may need refreshing.
+- If Gateway is stopped, press **Enable Gateway** and check `~/.hermes/logs/gateway.log`.
 
-### WSL Not Responding
-```powershell
-wsl --shutdown
-wsl --update
-```
-Then try the launcher again.
+## Author
 
-### Hermes Not Found
-If `hermes` commands are not recognized inside WSL:
-```bash
-# Inside Ubuntu-22.04
-source ~/.bashrc
-hash -r
-```
-If the issue persists, run the **Setup** launcher or reinstall Hermes Agent.
+Built by [Jay (jlaiii)](https://github.com/jlaiii)
 
----
+- GitHub: [jlaiii](https://github.com/jlaiii)
+- Website: [jlaiii.github.io/hermes-agent-windows](https://jlaiii.github.io/hermes-agent-windows)
 
-## Uninstall
-
-To remove Hermes Agent for Windows:
-
-1. Delete the launchers folder:
-   ```powershell
-   Remove-Item -Recurse -Force "$env:USERPROFILE\hermes-agent-windows"
-   ```
-2. Remove the desktop shortcuts manually.
-3. (Optional) Uninstall WSL and Ubuntu-22.04:
-   ```powershell
-   wsl --unregister Ubuntu-22.04
-   ```
-4. (Optional) Remove Hermes Agent files inside WSL by deleting its installation directory (e.g., `~/.local/share/hermes-agent/`).
-
----
-
-## Contributing
-
-Contributions are welcome! Please feel free to open an [issue](../../issues) or submit a [pull request](../../pulls) on GitHub.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
-
-Copyright (c) 2026 Jay / [jlaiii](https://github.com/jlaiii)

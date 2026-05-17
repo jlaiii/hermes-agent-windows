@@ -1,44 +1,19 @@
-# Windows
+# Generated runtime files
+logs/*.log
+logs/*.cmd
+logs/*.bat
+*.tmp
+*.temp
+
+# OS/IDE junk
+.DS_Store
 Thumbs.db
-Desktop.ini
-$RECYCLE.BIN/
+.vscode/
+.idea/
 
-# PowerShell
-*.ps1.log
-*.ps1.xml
+# Node
+node_modules/
 
-# WSL / Linux artifacts
-*.deb
-*.tar.gz
-*.zip
-
-# Installer output
-output/
+# Build artifacts
 dist/
 build/
-
-# Local configuration
-config.local.json
-.env
-
-# Logs
-*.log
-logs/
-
-# IDE
-.vs/
-.vscode/
-idea/
-
-# Node / Jekyll (for GitHub Pages)
-node_modules/
-_site/
-.sass-cache/
-.jekyll-cache/
-.jekyll-metadata
-
-# Temporary files
-*.tmp
-*.bak
-*.swp
-*~

@@ -3,180 +3,322 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hermes Agent for Windows — One-Click Installer</title>
-  <meta name="description" content="One-click Windows installer for Hermes Agent. Sets up WSL2, Ubuntu-22.04, Ollama, and Hermes Agent automatically.">
+  <title>hermes-agent-windows — Hermes Agent for Windows</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#050711;
-      --surface:#0b0f1e;
-      --text:#e5e8ef;
-      --muted:#9aa3b2;
-      --accent:#00e5ff;
-      --accent-2:#7c4dff;
-      --border:rgba(255,255,255,.06);
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0b0d10;
+      --bg-elev: #111318;
+      --bg-card: #171a20;
+      --border: #252a32;
+      --text: #e2e5eb;
+      --text-muted: #8b919d;
+      --accent: #3b82f6;
+      --accent-hover: #5a9af8;
+      --accent-glow: rgba(59,130,246,0.12);
+      --good: #3ecf7a;
+      --warn: #f59e0b;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      background:radial-gradient(1200px 600px at 50% -10%,#111935 0%,var(--bg) 55%);
-      color:var(--text);
-      line-height:1.65;
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .container{max-width:980px;margin:0 auto;padding:48px 20px}
-    header{text-align:center;margin-bottom:56px}
-    .brand{display:inline-flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.025em;font-size:clamp(26px,5vw,38px)}
-    .brand span{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;color:transparent}
-    .tagline{color:var(--muted);margin-top:10px;font-size:clamp(15px,2.2vw,18px);max-width:640px;margin-left:auto;margin-right:auto}
-    .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px}
-    .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:12px;font-weight:700;border:1px solid var(--border);transition:transform .08s ease,box-shadow .25s ease}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,255,.15);text-decoration:none}
-    .primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#000;border-color:transparent}
-    .secondary{background:var(--surface);color:var(--text)}
-    section{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:24px}
-    h2{margin-top:0;font-size:22px;letter-spacing:-.01em;margin-bottom:16px}
-    h3{font-size:18px;margin:22px 0 10px}
-    pre{overflow-x:auto;background:#040817;border:1px solid var(--border);padding:16px;border-radius:14px;font-size:13px}
-    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;background:rgba(255,255,255,.06);padding:2px 7px;border-radius:6px;font-size:.95em}
-    .steps{display:grid;gap:14px}
-    .step{display:flex;gap:14px;align-items:flex-start}
-    .step .num{flex:0 0 36px;height:36px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#000;font-weight:800;font-size:14px}
-    .step .body{flex:1}
-    ul{padding-left:20px;margin:8px 0}
-    li{margin:6px 0}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-    .card{background:#0e1430;border:1px solid var(--border);border-radius:16px;padding:18px}
-    .card h4{margin:0 0 8px;font-size:16px}
-    .card p{margin:0;color:var(--muted);font-size:14px}
-    .badge{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--muted);margin-right:6px}
-    footer{text-align:center;color:var(--muted);font-size:14px;margin-top:10px;padding-bottom:40px}
-    footer a{color:var(--accent-2)}
-    @media (max-width:520px){.grid{grid-template-columns:1fr}}
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* nav */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(11,13,16,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.5rem; }
+    .nav-brand { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.3px; }
+    .nav-brand span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2rem; font-size: 0.875rem; font-weight: 500; }
+    .nav-links a { color: var(--text-muted); }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    /* hero */
+    .hero { padding: 9rem 0 5.5rem; text-align: center; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800; letter-spacing: -1px; line-height: 1.05; margin-bottom: 1.25rem; }
+    .hero h1 span { color: var(--accent); }
+    .hero p { font-size: 1.15rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 2.5rem; }
+
+    .install-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; max-width: 680px; margin: 0 auto 1.5rem; text-align: left; overflow-x: auto; }
+    .install-box code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.93rem; color: var(--text);
+      display: block; white-space: nowrap;
+    }
+    .install-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .btn-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.7rem 1.5rem; border-radius: 8px; font-size: 0.92rem; font-weight: 600;
+      border: 1px solid var(--border); background: var(--bg-card); color: var(--text);
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .btn:hover { border-color: var(--accent); background: var(--accent-glow); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); box-shadow: 0 0 24px var(--accent-glow); }
+
+    /* section defaults */
+    section { padding: 5rem 0; }
+    .section-title {
+      font-size: 2rem; font-weight: 700; letter-spacing: -0.5px;
+      margin-bottom: 0.5rem; text-align: center;
+    }
+    .section-sub {
+      color: var(--text-muted); text-align: center; max-width: 520px;
+      margin: 0 auto 3rem; font-size: 1rem;
+    }
+
+    /* features */
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+    .feature-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.75rem; transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+    .feature-card:hover { border-color: #344050; transform: translateY(-2px); }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.6rem; }
+    .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.55; }
+    .feature-icon {
+      display: inline-flex; width: 24px; height: 24px; border-radius: 6px;
+      align-items: center; justify-content: center; font-size: 0.85rem;
+      background: var(--accent-glow); color: var(--accent);
+    }
+
+    /* how it works */
+    .steps { max-width: 720px; margin: 0 auto; }
+    .step {
+      display: flex; gap: 1.25rem; align-items: flex-start; padding: 1.5rem 2rem;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+    .step-num {
+      flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent); color: #fff; font-weight: 700; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center; margin-top: 0.1rem;
+    }
+    .step h4 { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; }
+    .step p { font-size: 0.9rem; color: var(--text-muted); }
+
+    /* code */
+    pre {
+      background: #0e1014; border: 1px solid #1c2028; border-radius: 10px;
+      padding: 1.25rem 1.5rem; overflow-x: auto;
+    }
+    pre code { font-family: 'JetBrains Mono', monospace; font-size: 0.87rem; color: var(--text); }
+    code.inline { background: #15181e; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem; border: 1px solid var(--border); }
+
+    /* status demo */
+    .status-demo { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+    .status-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid #1e2229; font-size: 0.9rem; }
+    .status-row:last-child { border-bottom: none; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.running { background: var(--good); box-shadow: 0 0 8px rgba(62,207,122,0.35); }
+    .status-dot.missing { background: #c14b4b; box-shadow: 0 0 8px rgba(193,75,75,0.3); }
+    .status-dot.good { background: var(--good); }
+    .status-dot.info { background: var(--accent); }
+    .status-label { font-weight: 500; }
+    .status-value { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
+
+    /* footer */
+    footer { border-top: 1px solid var(--border); padding: 2.5rem 0; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+    }
   </style>
 </head>
 <body>
+
+<nav>
   <div class="container">
-
-    <header>
-      <div class="brand">Hermes <span>for Windows</span></div>
-      <p class="tagline">One-click installer that sets up WSL2, Ubuntu-22.04, Ollama, and Hermes Agent — plus desktop shortcuts and .bat launchers.</p>
-      <div class="cta">
-        <a class="btn primary" href="https://github.com/jlaiii/hermes-agent-windows/releases/latest">Download Latest</a>
-        <a class="btn secondary" href="https://github.com/jlaiii/hermes-agent-windows">View on GitHub</a>
+    <div class="nav-inner">
+      <div class="nav-brand">Hermes<span>Agent for Windows</span></div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How It Works</a>
+        <a href="#install">Install</a>
+        <a href="https://github.com/jlaiii/hermes-agent-windows" target="_blank">GitHub</a>
       </div>
-      <p style="margin-top:10px;font-size:13px;color:var(--muted)">Or run it from PowerShell (Admin) in one line:</p>
-      <pre style="max-width:720px;margin:10px auto 0"><code>irm https://raw.githubusercontent.com/jlaiii/hermes-agent-windows/main/Install-Hermes-Windows.ps1 | iex</code></pre>
-    </header>
-
-    <section id="about">
-      <h2>What This Project Is For</h2>
-      <p><a href="https://github.com/NousResearch/hermes-agent">Hermes Agent</a> is an open-source AI agent by Nous Research. It officially supports Linux, macOS, and WSL2 — not native Windows.</p>
-      <p>This installer is built for <strong>Windows users who want Hermes Agent to just work</strong> without manually setting up WSL, Ubuntu, Ollama, and Linux dependencies. Run one script, and it handles the entire setup automatically — including the mandatory reboot and resume.</p>
-      <p>You end up with real Windows desktop shortcuts and <code>.bat</code> launchers, so you never have to touch WSL commands manually.</p>
-    </section>
-
-    <section id="features">
-      <h2>What It Does</h2>
-      <div class="grid">
-        <div class="card">
-          <h4>One-Click Install</h4>
-          <p>Run a single PowerShell script and walk away. Handles every dependency automatically.</p>
-        </div>
-        <div class="card">
-          <h4>WSL2 + Ubuntu-22.04</h4>
-          <p>Checks, installs, configures WSL2, and pulls Ubuntu-22.04 if missing. Reboots and resumes automatically.</p>
-        </div>
-        <div class="card">
-          <h4>Ollama Included</h4>
-          <p>Installs Ollama inside WSL and pulls a lightweight model so local AI works out of the box.</p>
-        </div>
-        <div class="card">
-          <h4>Hermes Agent</h4>
-          <p>Installs the official NousResearch Hermes Agent in WSL with the one-line installer.</p>
-        </div>
-        <div class="card">
-          <h4>Desktop Shortcuts</h4>
-          <p>Creates Start Menu and Desktop shortcuts for CLI, Gateway, Ollama Server, and Setup.</p>
-        </div>
-        <div class="card">
-          <h4>Portable Launchers</h4>
-          <p>Generates Windows .bat files so you can start services from Windows without touching WSL directly.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="quick-start">
-      <h2>Quick Start</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="num">1</div>
-          <div class="body"><strong>Download</strong> the latest release or copy the one-liner above.</div>
-        </div>
-        <div class="step">
-          <div class="num">2</div>
-          <div class="body"><strong>Run</strong> <code>Run-Setup.bat</code> (or the PowerShell script) as Administrator.</div>
-        </div>
-        <div class="step">
-          <div class="num">3</div>
-          <div class="body"><strong>Reboot</strong> when prompted (only if WSL was not already installed). Setup resumes automatically after login.</div>
-        </div>
-        <div class="step">
-          <div class="num">4</div>
-          <div class="body"><strong>Use</strong> the new Desktop shortcuts: Hermes CLI, Hermes Gateway, Ollama Server, and Hermes Setup.</div>
-        </div>
-      </div>
-    </section>
-
-    <section id="launchers">
-      <h2>Launchers Created</h2>
-      <ul>
-        <li><strong>Hermes CLI</strong> — Interactive chat inside WSL</li>
-        <li><strong>Hermes Gateway</strong> — Messaging gateway server (Telegram, Discord, etc.)</li>
-        <li><strong>Hermes ACP Server</strong> — ACP server for editor integrations</li>
-        <li><strong>Ollama Server</strong> — Local LLM inference backend</li>
-        <li><strong>Hermes Setup</strong> — First-time configuration wizard</li>
-      </ul>
-    </section>
-
-    <section id="system-requirements">
-      <h2>System Requirements</h2>
-      <ul>
-        <li>Windows 10 version 20H2 or later / Windows 11</li>
-        <li>Administrator privileges (WSL requires it)</li>
-        <li>At least ~4 GB free disk space</li>
-        <li>Internet connection during install</li>
-      </ul>
-    </section>
-
-    <section id="troubleshooting">
-      <h2>Troubleshooting</h2>
-      <h3>WSL requires a reboot</h3>
-      <p>This is normal on first-time installs. The script registers itself in <code>RunOnce</code> and resumes after login.</p>
-      <h3>Hermes command not found in WSL</h3>
-      <p>Open a new WSL terminal so the PATH update from the installer takes effect, or run <code>source ~/.bashrc</code>.</p>
-      <h3>Uninstall</h3>
-      <p>Run <code>Uninstall-Hermes-Windows.ps1</code> from the repo. Use <code>-KeepWSL</code> if you want to keep Ubuntu.</p>
-    </section>
-
-    <footer>
-      <p>
-        <span class="badge">MIT License</span>
-        <span class="badge">Windows 10/11</span>
-        <span class="badge">WSL2</span>
-      </p>
-      <p style="margin-top:8px">
-        Built by <a href="https://github.com/jlaiii">@jlaiii</a> for <a href="https://github.com/NousResearch/hermes-agent">NousResearch/hermes-agent</a>
-      </p>
-      <p>
-        <a href="https://github.com/jlaiii/hermes-agent-windows">GitHub Repo</a> &bull;
-        <a href="https://jlaiii.github.io/hermes-agent-windows/">GitHub Pages</a> &bull;
-        <a href="https://github.com/jlaiii/hermes-agent-windows/issues">Issues</a>
-      </p>
-    </footer>
-
+    </div>
   </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <h1>Hermes Agent, <span>zero friction</span> on Windows.</h1>
+    <p>One PowerShell command, one WPF GUI, and your entire Hermes + Ollama + WSL environment is ready to go inside WSL. No manual config needed.</p>
+
+    <div class="install-box" id="installBox">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="install-label">One-line installer (admin PowerShell)</div>
+        <button class="btn" style="padding:0.3rem 0.7rem;font-size:0.78rem;align-self:flex-start;"
+                onclick="navigator.clipboard.writeText(document.getElementById('oneLiner').innerText.trim());this.textContent='Copied';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+      </div>
+      <code id="oneLiner">irm https://jlaiii.github.io/hermes-agent-windows/install.ps1 | iex</code>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn btn-primary" href="https://github.com/jlaiii/hermes-agent-windows" target="_blank">View on GitHub</a>
+      <a class="btn" href="https://github.com/jlaiii/hermes-agent-windows/archive/refs/heads/main.zip">
+        Download ZIP
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="features" style="background: var(--bg-elev);">
+  <div class="container">
+    <h2 class="section-title">Everything in one place.</h2>
+    <p class="section-sub">Checks, installs, starts, monitors, and updates every part of the Hermes stack from a single Windows GUI.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3><span class="feature-icon">></span> One-command setup</h3>
+        <p>Paste the installer, it auto-elevates, downloads files, launches the GUI. No manual WSL or Linux commands.</p>
+      </div>
+      <div class="feature-card">
+        <h3><span class="feature-icon">></span> WPF GUI with live logs</h3>
+        <p>Status cards for WSL, Ollama, Hermes, and Gateway. Watch the live log panel while setup runs in the background.</p>
+      </div>
+      <div class="feature-card">
+        <h3><span class="feature-icon">></span> WSL managed for you</h3>
+        <p>Installs WSL if missing, warns for reboots, starts or restarts the distro, and creates an <code class="inline">admin</code> helper account.</p>
+      </div>
+      <div class="feature-card">
+        <h3><span class="feature-icon">></span> Ollama in WSL</h3>
+        <p>Ollama is installed and served inside WSL, not on the Windows host. API key and cloud model picker built in.</p>
+      </div>
+      <div class="feature-card">
+        <h3><span class="feature-icon">></span> Hermes Agent lifecycle</h3>
+        <p>Install, update, start, stop, restart, doctor, and clean Hermes Agent without leaving Windows.</p>
+      </div>
+      <div class="feature-card">
+        <h3><span class="feature-icon">></span> Gateway + Dashboard</h3>
+        <p>Start the Hermes gateway from the GUI, then open the web dashboard at <code class="inline">localhost:9119</code> with one click.</p>
+      </div>
+      <div class="feature-card">
+        <h3><span class="feature-icon">></span> Safe reruns</h3>
+        <p>Every action checks state first before modifying anything. Wipe and reinstall buttons require explicit confirmation.</p>
+      </div>
+      <div class="feature-card">
+        <h3><span class="feature-icon">></span> Windows shortcuts</h3>
+        <p>Install or remove Desktop and Start Menu shortcuts directly from the GUI. Clean, no registry hacks.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="container">
+    <h2 class="section-title">How it works.</h2>
+    <p class="section-sub">Four steps from nothing to a running Hermes Agent inside WSL.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h4>Paste the one-liner</h4>
+          <p>Open PowerShell, paste the installer, press Enter. It requests Admin rights, downloads the project, and launches the GUI.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h4>Check status</h4>
+          <p>The GUI shows color-coded cards for every component. Red means missing, green means ready. Hit Check Status anytime.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h4>Run full setup</h4>
+          <p>Click Start Hermes Agent Setup. It installs WSL, creates the admin account, installs Ollama, installs Hermes, and starts the gateway.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <h4>Use it</h4>
+          <p>Launch the Hermes CLI in a Windows terminal through WSL, open the web dashboard, or manage everything from the GUI.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background: var(--bg-elev);">
+  <div class="container">
+    <h2 class="section-title">Real-time status cards.</h2>
+    <p class="section-sub">See exactly what is running and what needs attention at a glance.</p>
+
+    <div style="max-width: 600px; margin: 0 auto;">
+      <div class="status-demo">
+        <div class="status-row">
+          <div class="status-dot running"></div>
+          <div class="status-label">WSL Status</div>
+          <div class="status-value">Running</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot running"></div>
+          <div class="status-label">Ollama Status</div>
+          <div class="status-value">Running</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot running"></div>
+          <div class="status-label">Hermes Agent</div>
+          <div class="status-value">Installed</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot missing"></div>
+          <div class="status-label">Hermes Gateway</div>
+          <div class="status-value">Stopped</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot good"></div>
+          <div class="status-label">Admin Check</div>
+          <div class="status-value">OK</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot info"></div>
+          <div class="status-label">Updates</div>
+          <div class="status-value">Check available</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="container">
+    <h2 class="section-title">Install.</h2>
+    <p class="section-sub">Pick the method that fits you best. All end up in the same GUI.</p>
+
+    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">Option 1: One-liner (recommended)</h3>
+    <pre><code>irm https://jlaiii.github.io/hermes-agent-windows/install.ps1 | iex</code></pre>
+
+    <h3 style="font-size: 1rem; font-weight: 600; margin: 2.5rem 0 0.75rem;">Option 2: Manual run from ZIP</h3>
+    <pre><code>powershell.exe -ExecutionPolicy Bypass -File .\hermes-agent-windows.ps1</code></pre>
+
+    <h3 style="font-size: 1rem; font-weight: 600; margin: 2.5rem 0 0.75rem;">Option 3: Double-click batch</h3>
+    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Extract the ZIP and double-click <code class="inline">hermes-agent-windows.bat</code>. It auto-requests admin rights and handles execution policy.</p>
+  </div>
+</section>
+
+  <footer>
+  <div class="container">
+    <p>Built by <a href="https://github.com/jlaiii" target="_blank">Jay (jlaiii)</a> — <a href="https://github.com/jlaiii/hermes-agent-windows" target="_blank">github.com/jlaiii/hermes-agent-windows</a></p>
+    <p style="margin-top: 0.25rem; opacity: 0.7;">Open source under the project license. Not affiliated with Nous Research.</p>
+  </div>
+</footer>
+
 </body>
 </html>
